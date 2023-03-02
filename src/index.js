@@ -1,5 +1,5 @@
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api.js";
-import "./client";
+import "./client.js";
 
 const LANGUAGE_ID = "javascript";
 const MODEL_URI = "inmemory://model.js";

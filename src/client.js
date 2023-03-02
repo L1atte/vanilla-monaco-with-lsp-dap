@@ -1,5 +1,6 @@
 import { MonacoLanguageClient, CloseAction, ErrorAction, MonacoServices, MessageTransports } from "monaco-languageclient";
 import { toSocket, WebSocketMessageReader, WebSocketMessageWriter } from "vscode-ws-jsonrpc";
+import normalizeUrl from 'normalize-url';
 
 // create the web socket
 const url = createUrl("localhost", 3000, "/sampleServer");
