@@ -1,13 +1,25 @@
-const path = require("path");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
-const MonacoWebpackPlugin = require("monaco-editor-webpack-plugin");
+import { fileURLToPath } from "url";
+import { dirname, resolve } from "path";
+import HtmlWebpackPlugin from "html-webpack-plugin";
+import MonacoEditorWebpackPlugin from "monaco-editor-webpack-plugin";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const projectRoot = resolve(__dirname);
 
 const isProduction = process.env.NODE_ENV == "production";
 
 const config = {
 	entry: "./src/index.js",
 	output: {
-		path: path.resolve(__dirname, "dist"),
+		path: resolve(__dirname, "dist"),
+	},
+	target: "web",
+	resolve: {
+		extensions: [".ts", ".js", ".json", ".ttf"],
+		fallback: {
+			path: resolve(projectRoot, "node_modules", "path-browserify"),
+		},
 	},
 	devServer: {
 		open: false,
@@ -17,7 +29,7 @@ const config = {
 		new HtmlWebpackPlugin({
 			template: "index.html",
 		}),
-		new MonacoWebpackPlugin(),
+		new MonacoEditorWebpackPlugin(),
 		// Add your plugins here
 		// Learn more about plugins from https://webpack.js.org/configuration/plugins/
 	],
@@ -42,7 +54,7 @@ const config = {
 	},
 };
 
-module.exports = () => {
+export default () => {
 	if (isProduction) {
 		config.mode = "production";
 	} else {

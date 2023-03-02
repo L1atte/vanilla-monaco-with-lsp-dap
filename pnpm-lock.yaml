@@ -10,7 +10,8 @@ specifiers:
   monaco-editor: 0.34.1
   monaco-editor-webpack-plugin: ^7.0.1
   monaco-languageclient: ^4.0.3
-  normalize-url: ^8.0.0
+  normalize-url: ~8.0.0
+  path-browserify: ^1.0.1
   style-loader: ^3.3.1
   vscode-oniguruma: ^1.6.2
   vscode-textmate: ^7.0.1
@@ -35,6 +36,7 @@ devDependencies:
   css-loader: 6.7.3_webpack@5.75.0
   html-webpack-plugin: 5.5.0_webpack@5.75.0
   monaco-editor-webpack-plugin: 7.0.1_feckyf2jam7vk36gev3ykueqty
+  path-browserify: 1.0.1
   style-loader: 3.3.1_webpack@5.75.0
   webpack: 5.75.0_webpack-cli@5.0.1
   webpack-cli: 5.0.1_2sosoctzuel4ixsflqwynycpla
@@ -4639,6 +4641,10 @@ packages:
     dependencies:
       no-case: 3.0.4
       tslib: 2.5.0
+    dev: true
+
+  /path-browserify/1.0.1:
+    resolution: {integrity: sha512-b7uo2UCUOYZcnF/3ID0lulOJi/bafxa1xPe7ZPsammBSpjSWQkjNxlt635YGS2MiR9GjvuXCtz2emr3jbsz98g==}
     dev: true
 
   /path-exists/4.0.0:
