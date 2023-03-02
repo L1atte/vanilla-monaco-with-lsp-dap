@@ -28,6 +28,11 @@
     "webpack-dev-server": "^4.11.1"
   },
   "dependencies": {
-    "monaco-editor": "0.34.1"
+    "monaco-editor": "0.34.1",
+    "monaco-languageclient": "^4.0.3",
+    "normalize-url": "~8.0.0",
+    "vscode-oniguruma": "^1.6.2",
+    "vscode-textmate": "^7.0.1",
+    "vscode-ws-jsonrpc": "^2.0.2"
   }
 }

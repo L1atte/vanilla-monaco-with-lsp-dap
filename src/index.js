@@ -1,12 +1,11 @@
-import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js';
+import * as monaco from "monaco-editor/esm/vs/editor/editor.api.js";
+import "./client";
 
 const LANGUAGE_ID = "javascript";
 const MODEL_URI = "inmemory://model.js";
 const MONACO_URI = monaco.Uri.parse(MODEL_URI);
-const VALUE = `
-  const a = 'hello world'
-  console.log(a)
-`;
+const VALUE = `const a = 'hello world'
+console.log(a)`;
 
 // register Monaco languages
 monaco.languages.register({
@@ -17,7 +16,7 @@ monaco.languages.register({
 
 // create monaco instance
 monaco.editor.create(document.getElementById("container"), {
-  // create monaco model
+	// create monaco model
 	model: monaco.editor.createModel(VALUE, LANGUAGE_ID, MONACO_URI),
 	glyphMargin: true,
 	lightbulb: {
