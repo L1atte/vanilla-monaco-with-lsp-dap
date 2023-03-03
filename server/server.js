@@ -14,7 +14,9 @@ const app = express();
 // server the static content, i.e. index.html
 app.use(express.static(getLocalDirectory()));
 // start the server
-const server = app.listen(3000);
+const server = app.listen(3000, () => {
+	console.log("listen success");
+});
 // create the web socket
 const wss = new WebSocketServer({
 	noServer: true,

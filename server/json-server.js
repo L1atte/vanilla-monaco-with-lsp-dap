@@ -3,7 +3,7 @@ import requestLight from "request-light";
 import URI from "vscode-uri";
 import { TextDocuments, createConnection } from "vscode-languageserver/lib/node/main.js";
 import { TextDocumentSyncKind } from "vscode-languageserver-protocol";
-import { getLanguageService } from "vscode-json-languageservice";
+import { getLanguageService } from "vscode-html-languageservice";
 import { TextDocument } from "vscode-languageserver-textdocument";
 export function start(reader, writer) {
 	const connection = createConnection(reader, writer);

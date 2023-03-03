@@ -10,7 +10,8 @@
     "build:dev": "webpack --mode=development",
     "build:prod": "webpack --mode=production --node-env=production",
     "watch": "webpack --watch",
-    "dev": "webpack serve"
+    "dev": "webpack serve",
+    "server": "node server/server.js"
   },
   "keywords": [],
   "author": "",
@@ -30,11 +31,20 @@
     "webpack-dev-server": "^4.11.1"
   },
   "dependencies": {
+    "vscode-languageserver-protocol": "3.17.2",
     "monaco-editor": "0.34.1",
     "monaco-languageclient": "^4.0.3",
     "normalize-url": "~8.0.0",
+    "vscode-html-languageservice": "^5.0.4",
     "vscode-oniguruma": "^1.6.2",
     "vscode-textmate": "^7.0.1",
-    "vscode-ws-jsonrpc": "^2.0.2"
+    "vscode-ws-jsonrpc": "^2.0.2",
+    "express": "~4.18.2",
+    "vscode-languageserver-textdocument": "^1.0.7",
+    "request-light": "~0.6.0",
+    "vscode-jsonrpc": "8.0.2",
+    "vscode-languageserver": "8.0.2",
+    "vscode-uri": "3.0.6",
+    "ws": "~8.11.0"
   }
 }
