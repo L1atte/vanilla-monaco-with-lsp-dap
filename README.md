@@ -12,4 +12,4 @@ or
 yarn build
 ```
 
-to bundle your application
+to bundle your applicationJavaScriptParser.g4

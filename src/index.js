@@ -1,28 +1,17 @@
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api.js";
-import "./client.js";
+// import "./client.js";
+import { parse } from "./parse.js";
 
-const LANGUAGE_ID = "html";
-const MODEL_URI = "inmemory://model.html";
+const LANGUAGE_ID = "javascript";
+const MODEL_URI = "inmemory://model.js";
 const MONACO_URI = monaco.Uri.parse(MODEL_URI);
-const VALUE = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-</head>
-<body>
-  
-</body>
-</html>`;
-let ishtml = true;
+const VALUE = `aaa`;
 
 // register Monaco languages
 monaco.languages.register({
 	id: LANGUAGE_ID,
-	extensions: [".html"],
-	aliases: ["html"],
+	extensions: [".js"],
+	aliases: ["js"],
 });
 
 // create monaco instance
@@ -34,6 +23,24 @@ const instance = monaco.editor.create(document.getElementById("container"), {
 		enabled: true,
 	},
 	automaticLayout: true,
+});
+
+// 添加悬停提示
+monaco.languages.registerHoverProvider("javascript", {
+	provideHover: function (model, position) {
+		// 获取悬停内容
+		const word = model.getWordAtPosition(position);
+		if (!word) return null;
+
+		const wordRange = {
+			startLineNumber: position.startLineNumber,
+			endLineNumber: position.endLineNumber,
+			startColumn: position.startColumn,
+			endColumn: position.endColumn,
+		};
+		const input = model.getValue();
+		parse(input, wordRange);
+	},
 });
 
 // 语言切换

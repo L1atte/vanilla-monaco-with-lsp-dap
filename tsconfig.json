@@ -1,0 +1,10 @@
+{
+	"compilerOptions": {
+		"target": "es6",
+		"module": "ESNext",
+		"allowJs": true,
+		"moduleResolution": "node",
+		"jsx": "react"
+	},
+	"include": ["./src"]
+}
