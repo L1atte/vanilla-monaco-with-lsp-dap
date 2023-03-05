@@ -1,6 +1,6 @@
 import { JavaScriptLexer } from "./ANTLR/JavaScriptLexer.ts";
 import { JavaScriptParser } from "./ANTLR/JavaScriptParser.ts";
-import { CharStreams, CommonTokenStream } from "antlr4ts";
+import { ANTLRInputStream, CommonTokenStream } from "antlr4ts";
 import { Visitor } from "./Visitor.js";
 
 /**
@@ -12,7 +12,7 @@ import { Visitor } from "./Visitor.js";
 这样，就可以实现JavaScript代码的悬停高亮上下文了。当鼠标悬停在JavaScript代码中时，Monaco编辑器
  */
 export function parse(code, wordRange) {
-	const inputStream = new CharStreams(code);
+	const inputStream = new ANTLRInputStream(code);
 	const lexer = new JavaScriptLexer(inputStream);
 	const tokenStream = new CommonTokenStream(lexer);
 	const parser = new JavaScriptParser(tokenStream);
@@ -21,11 +21,12 @@ export function parse(code, wordRange) {
 	const visitor = new Visitor();
 	// 遍历解析树，查找鼠标悬停单词所在的节点
 	visitor.visit(tree);
-	var hoverMessage = visitor.getHoverMessage(wordRange, word.word);
+	const hoverMessage = visitor.getHoverMessage(wordRange, word.word);
+	console.log("hover", tree, hoverMessage);
 	if (hoverMessage) {
 		return {
 			range: wordRange,
-			contents: [{ value: hoverMessage }],
+			contents: [{ value: "123" }],
 		};
 	} else {
 		return null;

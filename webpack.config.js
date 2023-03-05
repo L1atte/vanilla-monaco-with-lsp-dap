@@ -36,8 +36,8 @@ const config = {
 		new MonacoEditorWebpackPlugin(),
 		new DefinePlugin({
 			// "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
-			"process.env.NODE_DEBUG": JSON.stringify(process.env.NODE_DEBUG),
-		}),
+			"process.env.NODE_DEBUG": JSON.stringify(process.env.NODE_ENV),
+		}),		
 		// Add your plugins here
 		// Learn more about plugins from https://webpack.js.org/configuration/plugins/
 	],
