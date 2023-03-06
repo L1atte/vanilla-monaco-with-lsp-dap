@@ -37,11 +37,10 @@ const config = {
 		new DefinePlugin({
 			// "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
 			"process.env.NODE_DEBUG": JSON.stringify(process.env.NODE_ENV),
-		}),		
+		}),
 		// Add your plugins here
 		// Learn more about plugins from https://webpack.js.org/configuration/plugins/
 	],
-	devtool: "source-map",
 	module: {
 		rules: [
 			// {
@@ -72,6 +71,7 @@ export default () => {
 		config.mode = "production";
 	} else {
 		config.mode = "development";
+		config.devtool = "source-map";
 	}
 	return config;
 };

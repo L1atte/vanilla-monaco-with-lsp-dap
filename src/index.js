@@ -5,7 +5,9 @@ import { parse } from "./parse.js";
 const LANGUAGE_ID = "javascript";
 const MODEL_URI = "inmemory://model.js";
 const MONACO_URI = monaco.Uri.parse(MODEL_URI);
-const VALUE = `aaa`;
+const VALUE = `console.log('123')
+const a = 123;
+console.log(a)`;
 
 // register Monaco languages
 monaco.languages.register({
@@ -28,18 +30,28 @@ const instance = monaco.editor.create(document.getElementById("container"), {
 // 添加悬停提示
 monaco.languages.registerHoverProvider("javascript", {
 	provideHover: function (model, position) {
-		// 获取悬停内容
+		// 获取悬停内容;
 		const word = model.getWordAtPosition(position);
 		if (!word) return null;
 
-		const wordRange = {
-			startLineNumber: position.startLineNumber,
-			endLineNumber: position.endLineNumber,
-			startColumn: position.startColumn,
-			endColumn: position.endColumn,
-		};
-		const input = model.getValue();
-		parse(input, wordRange);
+		const range = new monaco.Range(position.lineNumber, word.startColumn, position.lineNumber, word.endColumn);
+		const id = instance.createDecorationsCollection([
+			{
+				range: range,
+				options: {
+					isWholeLine: true,
+					className: "red",
+				},
+			},
+		]);
+		// const wordRange = {
+		// 	startLineNumber: position.startLineNumber,
+		// 	endLineNumber: position.endLineNumber,
+		// 	startColumn: position.startColumn,
+		// 	endColumn: position.endColumn,
+		// };
+		// const input = model.getValue();
+		// parse(input, wordRange);
 	},
 });
 
