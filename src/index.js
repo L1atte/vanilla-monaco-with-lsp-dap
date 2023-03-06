@@ -1,6 +1,7 @@
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api.js";
 // import "./client.js";
 import { parse } from "./parse.js";
+import "./example/sqlite.js";
 
 const LANGUAGE_ID = "javascript";
 const MODEL_URI = "inmemory://model.js";
