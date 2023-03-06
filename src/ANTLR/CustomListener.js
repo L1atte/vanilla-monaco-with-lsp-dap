@@ -1,10 +1,28 @@
-// @ts-nocheck
-// Generated from SQLiteParser.g4 by ANTLR 4.10.1
-// jshint ignore: start
-import antlr4 from "antlr4";
+import SQLiteParserListener from "./SQLiteParserListener.js";
+import { SQLiteParser } from "./SQLiteParser.js";
+import { default as antlr4 } from "antlr4";
 
-// This class defines a complete listener for a parse tree produced by SQLiteParser.
-export default class SQLiteParserListener extends antlr4.tree.ParseTreeListener {
+export class CustomListener extends SQLiteParserListener {
+	constructor(result) {
+		super();
+		this.result = result;
+		this.sqlStruct = null;
+	}
+
+	buildSqlStruct(command) {
+		return {
+			command: command,
+			columns: [],
+			values: [],
+			table: [],
+			conditions: [],
+			range: null,
+			groupby: null,
+			orderby: null,
+			not: false,
+		};
+	}
+
 	// Enter a parse tree produced by SQLiteParser#parse.
 	enterParse(ctx) {}
 
@@ -23,71 +41,11 @@ export default class SQLiteParserListener extends antlr4.tree.ParseTreeListener 
 	// Exit a parse tree produced by SQLiteParser#sql_stmt.
 	exitSql_stmt(ctx) {}
 
-	// Enter a parse tree produced by SQLiteParser#alter_table_stmt.
-	enterAlter_table_stmt(ctx) {}
-
-	// Exit a parse tree produced by SQLiteParser#alter_table_stmt.
-	exitAlter_table_stmt(ctx) {}
-
-	// Enter a parse tree produced by SQLiteParser#analyze_stmt.
-	enterAnalyze_stmt(ctx) {}
-
-	// Exit a parse tree produced by SQLiteParser#analyze_stmt.
-	exitAnalyze_stmt(ctx) {}
-
-	// Enter a parse tree produced by SQLiteParser#attach_stmt.
-	enterAttach_stmt(ctx) {}
-
-	// Exit a parse tree produced by SQLiteParser#attach_stmt.
-	exitAttach_stmt(ctx) {}
-
-	// Enter a parse tree produced by SQLiteParser#begin_stmt.
-	enterBegin_stmt(ctx) {}
-
-	// Exit a parse tree produced by SQLiteParser#begin_stmt.
-	exitBegin_stmt(ctx) {}
-
-	// Enter a parse tree produced by SQLiteParser#commit_stmt.
-	enterCommit_stmt(ctx) {}
-
-	// Exit a parse tree produced by SQLiteParser#commit_stmt.
-	exitCommit_stmt(ctx) {}
-
-	// Enter a parse tree produced by SQLiteParser#rollback_stmt.
-	enterRollback_stmt(ctx) {}
-
-	// Exit a parse tree produced by SQLiteParser#rollback_stmt.
-	exitRollback_stmt(ctx) {}
-
-	// Enter a parse tree produced by SQLiteParser#savepoint_stmt.
-	enterSavepoint_stmt(ctx) {}
-
-	// Exit a parse tree produced by SQLiteParser#savepoint_stmt.
-	exitSavepoint_stmt(ctx) {}
-
-	// Enter a parse tree produced by SQLiteParser#release_stmt.
-	enterRelease_stmt(ctx) {}
-
-	// Exit a parse tree produced by SQLiteParser#release_stmt.
-	exitRelease_stmt(ctx) {}
-
-	// Enter a parse tree produced by SQLiteParser#create_index_stmt.
-	enterCreate_index_stmt(ctx) {}
-
-	// Exit a parse tree produced by SQLiteParser#create_index_stmt.
-	exitCreate_index_stmt(ctx) {}
-
 	// Enter a parse tree produced by SQLiteParser#indexed_column.
 	enterIndexed_column(ctx) {}
 
 	// Exit a parse tree produced by SQLiteParser#indexed_column.
 	exitIndexed_column(ctx) {}
-
-	// Enter a parse tree produced by SQLiteParser#create_table_stmt.
-	enterCreate_table_stmt(ctx) {}
-
-	// Exit a parse tree produced by SQLiteParser#create_table_stmt.
-	exitCreate_table_stmt(ctx) {}
 
 	// Enter a parse tree produced by SQLiteParser#column_def.
 	enterColumn_def(ctx) {}
@@ -131,24 +89,6 @@ export default class SQLiteParserListener extends antlr4.tree.ParseTreeListener 
 	// Exit a parse tree produced by SQLiteParser#conflict_clause.
 	exitConflict_clause(ctx) {}
 
-	// Enter a parse tree produced by SQLiteParser#create_trigger_stmt.
-	enterCreate_trigger_stmt(ctx) {}
-
-	// Exit a parse tree produced by SQLiteParser#create_trigger_stmt.
-	exitCreate_trigger_stmt(ctx) {}
-
-	// Enter a parse tree produced by SQLiteParser#create_view_stmt.
-	enterCreate_view_stmt(ctx) {}
-
-	// Exit a parse tree produced by SQLiteParser#create_view_stmt.
-	exitCreate_view_stmt(ctx) {}
-
-	// Enter a parse tree produced by SQLiteParser#create_virtual_table_stmt.
-	enterCreate_virtual_table_stmt(ctx) {}
-
-	// Exit a parse tree produced by SQLiteParser#create_virtual_table_stmt.
-	exitCreate_virtual_table_stmt(ctx) {}
-
 	// Enter a parse tree produced by SQLiteParser#with_clause.
 	enterWith_clause(ctx) {}
 
@@ -174,31 +114,152 @@ export default class SQLiteParserListener extends antlr4.tree.ParseTreeListener 
 	exitCommon_table_expression(ctx) {}
 
 	// Enter a parse tree produced by SQLiteParser#delete_stmt.
-	enterDelete_stmt(ctx) {}
+	enterDelete_stmt(ctx) {
+		this.sqlStruct = this.buildSqlStruct("delete");
+		ctx.children.forEach(child => {
+			switch (child.constructor.name) {
+				case "Qualified_table_nameContext":
+					this.sqlStruct.table = child.getText();
+					break;
+				case "ExprContext":
+					this.enterExpr_recursiveChildren(child.children);
+					break;
+			}
+		});
+	}
 
 	// Exit a parse tree produced by SQLiteParser#delete_stmt.
-	exitDelete_stmt(ctx) {}
+	exitDelete_stmt(ctx) {
+		if (this.sqlStruct && this.sqlStruct.command === "delete") {
+			var sql = [];
+			sql.push(`deleteId('${this.sqlStruct.table}', `);
+			// this is sloppy, but I didn't implement a full DELETE in the stupid database
+			if (this.sqlStruct.conditions && this.sqlStruct.conditions.length > 0) {
+				sql.push(this.sqlStruct.conditions.pop());
+			}
+			sql.push(`)`);
+			this.result.push(sql.join(""));
+			this.sqlStruct = null;
+		}
+	}
 
-	// Enter a parse tree produced by SQLiteParser#delete_stmt_limited.
-	enterDelete_stmt_limited(ctx) {}
+	enterExpr_invertOp(op) {
+		if (!this.sqlStruct.not) return op;
+		if (op !== ".") this.sqlStruct.not = false;
+		switch (op) {
+			case "=":
+				return "!=";
+			case ("<>", "!="):
+				return "=";
+			case ">":
+				return "<=";
+			case "<":
+				return ">=";
+			case ">=":
+				return "<";
+			case "<=":
+				return ">";
+			default:
+				return op;
+		}
+	}
 
-	// Exit a parse tree produced by SQLiteParser#delete_stmt_limited.
-	exitDelete_stmt_limited(ctx) {}
+	enterExpr_terminalNode(child) {
+		var op = this.enterExpr_invertOp(child.getText());
 
-	// Enter a parse tree produced by SQLiteParser#detach_stmt.
-	enterDetach_stmt(ctx) {}
+		switch (op) {
+			case "=":
+			case "IS":
+				return "===";
+			case "<>":
+			case "IS NOT":
+				return "!==";
+			case "AND":
+				return "&&";
+			case "OR":
+				return "||";
+			default:
+				return op;
+		}
+	}
 
-	// Exit a parse tree produced by SQLiteParser#detach_stmt.
-	exitDetach_stmt(ctx) {}
+	enterExpr_exprContext(child) {
+		if (child.constructor.name === "ExprContext") {
+			this.enterExpr_recursiveChildren(child.children);
+		} else {
+			return child.getText();
+		}
+	}
 
-	// Enter a parse tree produced by SQLiteParser#drop_stmt.
-	enterDrop_stmt(ctx) {}
-
-	// Exit a parse tree produced by SQLiteParser#drop_stmt.
-	exitDrop_stmt(ctx) {}
+	enterExpr_recursiveChildren(children) {
+		var custom_column = [];
+		var interval = null;
+		children.forEach(child => {
+			switch (child.constructor.name) {
+				case "Table_nameContext":
+					custom_column.push(child.getText());
+					break;
+				case "Column_nameContext":
+					custom_column.push(child.getText());
+					this.sqlStruct.conditions.push(custom_column.join(""));
+					custom_column = [];
+					break;
+				case "TerminalNodeImpl":
+					var terminal = this.enterExpr_terminalNode(child);
+					if (custom_column.length === 0) {
+						if (this.sqlStruct.range) {
+							this.sqlStruct.range.push(terminal);
+						} else {
+							this.sqlStruct.conditions.push(terminal);
+						}
+					} else {
+						custom_column.push(terminal);
+					}
+					if (terminal === "IN" || terminal === "NOT IN") {
+						this.sqlStruct.range = [];
+					}
+					if (terminal === ")" && this.sqlStruct.range) {
+						var op = this.sqlStruct.conditions.pop();
+						var name = this.sqlStruct.conditions.pop();
+						if (name === "NOT") {
+							name = this.sqlStruct.conditions.pop();
+							op = "NOT IN";
+						}
+						this.sqlStruct.range.shift();
+						this.sqlStruct.range.pop(); // remove parenthesis
+						var command = `[${this.sqlStruct.range.join("")}].includes(${name})`;
+						if (op === "NOT IN") {
+							command = `!(${command})`;
+						}
+						this.sqlStruct.conditions.push(command);
+						this.sqlStruct.range = null;
+					}
+					break;
+				case "Unary_operatorContext":
+					if (child.getText() === "NOT") {
+						this.sqlStruct.not = true;
+					}
+					break;
+				default:
+					var expr = this.enterExpr_exprContext(child);
+					if (expr) {
+						if (this.sqlStruct.range) {
+							this.sqlStruct.range.push(expr);
+						} else {
+							this.sqlStruct.conditions.push(expr);
+						}
+					}
+					break;
+			}
+		});
+	}
 
 	// Enter a parse tree produced by SQLiteParser#expr.
-	enterExpr(ctx) {}
+	enterExpr(ctx) {
+		if (this.sqlStruct && this.sqlStruct.conditions.length == 0 && ctx.children.length > 2) {
+			this.enterExpr_recursiveChildren(ctx.children);
+		}
+	}
 
 	// Exit a parse tree produced by SQLiteParser#expr.
 	exitExpr(ctx) {}
@@ -216,16 +277,38 @@ export default class SQLiteParserListener extends antlr4.tree.ParseTreeListener 
 	exitLiteral_value(ctx) {}
 
 	// Enter a parse tree produced by SQLiteParser#insert_stmt.
-	enterInsert_stmt(ctx) {}
+	enterInsert_stmt(ctx) {
+		this.sqlStruct = this.buildSqlStruct("insert");
+		ctx.children.forEach(child => {
+			switch (child.constructor.name) {
+				case "Table_nameContext":
+					this.sqlStruct.table = child.getText();
+					break;
+				case "TerminalNodeImpl":
+					break;
+				case "Column_nameContext":
+					this.sqlStruct.columns.push(child.getText());
+					break;
+				case "ExprContext":
+					this.sqlStruct.values.push(child.getText());
+					break;
+				default:
+					break;
+			}
+		});
+	}
 
 	// Exit a parse tree produced by SQLiteParser#insert_stmt.
-	exitInsert_stmt(ctx) {}
-
-	// Enter a parse tree produced by SQLiteParser#returning_clause.
-	enterReturning_clause(ctx) {}
-
-	// Exit a parse tree produced by SQLiteParser#returning_clause.
-	exitReturning_clause(ctx) {}
+	exitInsert_stmt(ctx) {
+		if (this.sqlStruct && this.sqlStruct.command === "insert") {
+			var values = [];
+			this.sqlStruct.columns.forEach(column => {
+				values.push(`${column}: ${this.sqlStruct.values.shift()}`);
+			});
+			this.result.push(`insert('${this.sqlStruct.table}', {${values.join(", ")}})`);
+			this.sqlStruct = null;
+		}
+	}
 
 	// Enter a parse tree produced by SQLiteParser#upsert_clause.
 	enterUpsert_clause(ctx) {}
@@ -252,16 +335,46 @@ export default class SQLiteParserListener extends antlr4.tree.ParseTreeListener 
 	exitReindex_stmt(ctx) {}
 
 	// Enter a parse tree produced by SQLiteParser#select_stmt.
-	enterSelect_stmt(ctx) {}
+	enterSelect_stmt(ctx) {
+		this.sqlStruct = this.buildSqlStruct("select");
+	}
 
 	// Exit a parse tree produced by SQLiteParser#select_stmt.
-	exitSelect_stmt(ctx) {}
+	exitSelect_stmt(ctx) {
+		if (this.sqlStruct) {
+			var sql = [];
+			if (this.sqlStruct.orderby) {
+				var order = this.sqlStruct.orderby.pop();
+				sql.push(`, orderBy('${this.sqlStruct.orderby.join(",")}', '${order.toLowerCase()}' `);
+			}
+			if (this.sqlStruct.table) {
+				sql.push(", from('" + this.sqlStruct.table.join(","));
+				if (this.sqlStruct.conditions.length > 0) {
+					sql.push(`', { where: "${this.sqlStruct.conditions.join(" ")}"})`);
+				} else {
+					sql.push("'");
+				}
+				sql.push(")");
+			}
+			if (this.sqlStruct.orderby) {
+				sql.push(")");
+			}
+			this.result.push(`select('${this.sqlStruct.columns.join(",")}'${sql.join("")})`);
+			this.sqlStruct = null;
+		}
+	}
 
 	// Enter a parse tree produced by SQLiteParser#join_clause.
-	enterJoin_clause(ctx) {}
+	enterJoin_clause(ctx) {
+		console.log("enterJoin_clause");
+		this.result.push("innerJoin(");
+	}
 
 	// Exit a parse tree produced by SQLiteParser#join_clause.
-	exitJoin_clause(ctx) {}
+	exitJoin_clause(ctx) {
+		console.log("exitJoin_clause");
+		this.result.push(")");
+	}
 
 	// Enter a parse tree produced by SQLiteParser#select_core.
 	enterSelect_core(ctx) {}
@@ -288,13 +401,21 @@ export default class SQLiteParserListener extends antlr4.tree.ParseTreeListener 
 	exitCompound_select_stmt(ctx) {}
 
 	// Enter a parse tree produced by SQLiteParser#table_or_subquery.
-	enterTable_or_subquery(ctx) {}
+	enterTable_or_subquery(ctx) {
+		if (this.sqlStruct) {
+			this.sqlStruct.table.push(ctx.getText());
+		}
+	}
 
 	// Exit a parse tree produced by SQLiteParser#table_or_subquery.
 	exitTable_or_subquery(ctx) {}
 
 	// Enter a parse tree produced by SQLiteParser#result_column.
-	enterResult_column(ctx) {}
+	enterResult_column(ctx) {
+		if (this.sqlStruct) {
+			this.sqlStruct.columns.push(ctx.getText());
+		}
+	}
 
 	// Exit a parse tree produced by SQLiteParser#result_column.
 	exitResult_column(ctx) {}
@@ -318,10 +439,53 @@ export default class SQLiteParserListener extends antlr4.tree.ParseTreeListener 
 	exitCompound_operator(ctx) {}
 
 	// Enter a parse tree produced by SQLiteParser#update_stmt.
-	enterUpdate_stmt(ctx) {}
+	enterUpdate_stmt(ctx) {
+		this.sqlStruct = this.buildSqlStruct("update");
+		var lastTerminal = null;
+		ctx.children.forEach(child => {
+			switch (child.constructor.name) {
+				case "Qualified_table_nameContext":
+					this.sqlStruct.table = child.getText();
+					break;
+				case "Column_nameContext":
+					this.sqlStruct.columns.push(child.getText());
+					break;
+				case "TerminalNodeImpl":
+					if (child.getText() === "=") {
+						lastTerminal = true;
+					}
+					break;
+				case "ExprContext":
+					if (lastTerminal) {
+						this.sqlStruct.values.push(child.getText());
+						lastTerminal = false;
+					} else {
+						this.enterExpr_recursiveChildren(child.children);
+					}
+					break;
+			}
+		});
+	}
 
 	// Exit a parse tree produced by SQLiteParser#update_stmt.
-	exitUpdate_stmt(ctx) {}
+	exitUpdate_stmt(ctx) {
+		if (this.sqlStruct && this.sqlStruct.command === "update") {
+			var sql = [];
+			sql.push(`updateFrom('${this.sqlStruct.table}', {`);
+			var values = [];
+			this.sqlStruct.columns.forEach((column, index) => {
+				values.push(`${column}: ${this.sqlStruct.values[index]}`);
+			});
+			sql.push(`${values.join(",")}}`);
+			if (this.sqlStruct.conditions && this.sqlStruct.conditions.length > 0) {
+				sql.push(`, { where: "${this.sqlStruct.conditions.join(" ")}"})`);
+			} else {
+				sql.push(`)`);
+			}
+			this.result.push(sql.join(""));
+			this.sqlStruct = null;
+		}
+	}
 
 	// Enter a parse tree produced by SQLiteParser#column_name_list.
 	enterColumn_name_list(ctx) {}
@@ -396,13 +560,28 @@ export default class SQLiteParserListener extends antlr4.tree.ParseTreeListener 
 	exitWindow_function_invocation(ctx) {}
 
 	// Enter a parse tree produced by SQLiteParser#common_table_stmt.
-	enterCommon_table_stmt(ctx) {}
+	enterCommon_table_stmt(ctx) {
+		console.log(ctx.getText());
+	}
 
 	// Exit a parse tree produced by SQLiteParser#common_table_stmt.
 	exitCommon_table_stmt(ctx) {}
 
 	// Enter a parse tree produced by SQLiteParser#order_by_stmt.
-	enterOrder_by_stmt(ctx) {}
+	enterOrder_by_stmt(ctx) {
+		this.sqlStruct.orderby = [];
+		ctx.children.forEach(child => {
+			if (child.constructor.name === "Ordering_termContext") {
+				child.children.forEach(child => {
+					this.sqlStruct.orderby.push(child.getText());
+				});
+			}
+		});
+		var lastElem = this.sqlStruct.orderby[this.sqlStruct.orderby.length - 1];
+		if (lastElem !== "ASC" && lastElem !== "DESC") {
+			this.sqlStruct.orderby.push("ASC");
+		}
+	}
 
 	// Exit a parse tree produced by SQLiteParser#order_by_stmt.
 	exitOrder_by_stmt(ctx) {}
@@ -449,17 +628,17 @@ export default class SQLiteParserListener extends antlr4.tree.ParseTreeListener 
 	// Exit a parse tree produced by SQLiteParser#window_function.
 	exitWindow_function(ctx) {}
 
-	// Enter a parse tree produced by SQLiteParser#offset.
-	enterOffset(ctx) {}
+	// Enter a parse tree produced by SQLiteParser#of_OF_fset.
+	enterOf_OF_fset(ctx) {}
 
-	// Exit a parse tree produced by SQLiteParser#offset.
-	exitOffset(ctx) {}
+	// Exit a parse tree produced by SQLiteParser#of_OF_fset.
+	exitOf_OF_fset(ctx) {}
 
-	// Enter a parse tree produced by SQLiteParser#default_value.
-	enterDefault_value(ctx) {}
+	// Enter a parse tree produced by SQLiteParser#default_DEFAULT__value.
+	enterDefault_DEFAULT__value(ctx) {}
 
-	// Exit a parse tree produced by SQLiteParser#default_value.
-	exitDefault_value(ctx) {}
+	// Exit a parse tree produced by SQLiteParser#default_DEFAULT__value.
+	exitDefault_DEFAULT__value(ctx) {}
 
 	// Enter a parse tree produced by SQLiteParser#partition_by.
 	enterPartition_by(ctx) {}
@@ -468,22 +647,34 @@ export default class SQLiteParserListener extends antlr4.tree.ParseTreeListener 
 	exitPartition_by(ctx) {}
 
 	// Enter a parse tree produced by SQLiteParser#order_by_expr.
-	enterOrder_by_expr(ctx) {}
+	enterOrder_by_expr(ctx) {
+		console.log("enterOrder_by_expr");
+	}
 
 	// Exit a parse tree produced by SQLiteParser#order_by_expr.
-	exitOrder_by_expr(ctx) {}
+	exitOrder_by_expr(ctx) {
+		console.log("exitOrder_by_expr");
+	}
 
 	// Enter a parse tree produced by SQLiteParser#order_by_expr_asc_desc.
-	enterOrder_by_expr_asc_desc(ctx) {}
+	enterOrder_by_expr_asc_desc(ctx) {
+		console.log("enterOrder_by_expr_asc_desc");
+	}
 
 	// Exit a parse tree produced by SQLiteParser#order_by_expr_asc_desc.
-	exitOrder_by_expr_asc_desc(ctx) {}
+	exitOrder_by_expr_asc_desc(ctx) {
+		console.log("exitOrder_by_expr_asc_desc");
+	}
 
 	// Enter a parse tree produced by SQLiteParser#expr_asc_desc.
-	enterExpr_asc_desc(ctx) {}
+	enterExpr_asc_desc(ctx) {
+		console.log("enterExpr_asc_desc");
+	}
 
 	// Exit a parse tree produced by SQLiteParser#expr_asc_desc.
-	exitExpr_asc_desc(ctx) {}
+	exitExpr_asc_desc(ctx) {
+		console.log("exitExpr_asc_desc");
+	}
 
 	// Enter a parse tree produced by SQLiteParser#initial_select.
 	enterInitial_select(ctx) {}
@@ -491,11 +682,11 @@ export default class SQLiteParserListener extends antlr4.tree.ParseTreeListener 
 	// Exit a parse tree produced by SQLiteParser#initial_select.
 	exitInitial_select(ctx) {}
 
-	// Enter a parse tree produced by SQLiteParser#recursive_select.
-	enterRecursive_select(ctx) {}
+	// Enter a parse tree produced by SQLiteParser#recursive__select.
+	enterRecursive__select(ctx) {}
 
-	// Exit a parse tree produced by SQLiteParser#recursive_select.
-	exitRecursive_select(ctx) {}
+	// Exit a parse tree produced by SQLiteParser#recursive__select.
+	exitRecursive__select(ctx) {}
 
 	// Enter a parse tree produced by SQLiteParser#unary_operator.
 	enterUnary_operator(ctx) {}
@@ -556,6 +747,12 @@ export default class SQLiteParserListener extends antlr4.tree.ParseTreeListener 
 
 	// Exit a parse tree produced by SQLiteParser#table_or_index_name.
 	exitTable_or_index_name(ctx) {}
+
+	// Enter a parse tree produced by SQLiteParser#new_table_name.
+	enterNew_table_name(ctx) {}
+
+	// Exit a parse tree produced by SQLiteParser#new_table_name.
+	exitNew_table_name(ctx) {}
 
 	// Enter a parse tree produced by SQLiteParser#column_name.
 	enterColumn_name(ctx) {}

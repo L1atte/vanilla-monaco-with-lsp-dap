@@ -4,7 +4,7 @@ specifiers:
   '@babel/core': ^7.21.0
   '@babel/preset-env': ^7.20.2
   '@webpack-cli/generators': ^3.0.1
-  antlr4: ^4.12.0
+  antlr4: 4.10.1
   antlr4ts: 0.5.0-alpha.4
   antlr4ts-cli: 0.5.0-alpha.4
   assert: ^2.0.0
@@ -37,7 +37,7 @@ specifiers:
   ws: ~8.11.0
 
 dependencies:
-  antlr4: 4.12.0
+  antlr4: 4.10.1
   antlr4ts: 0.5.0-alpha.4
   assert: 2.0.0
   express: 4.18.2
@@ -2046,9 +2046,9 @@ packages:
       color-convert: 2.0.1
     dev: true
 
-  /antlr4/4.12.0:
-    resolution: {integrity: sha512-23iB5IzXJZRZeK9TigzUyrNc9pSmNqAerJRBcNq1ETrmttMWRgaYZzC561IgEO3ygKsDJTYDTozABXa4b/fTQQ==}
-    engines: {node: '>=16'}
+  /antlr4/4.10.1:
+    resolution: {integrity: sha512-fmxidcOwmktzHUD+tz8y/zKLI/NfVAB0+MOvnFUBzo8ToFnphK8JY88oOJeRdhnTrAhjtu45bvxddzbb8nMeIA==}
+    engines: {node: '>=14'}
     dev: false
 
   /antlr4ts-cli/0.5.0-alpha.4:

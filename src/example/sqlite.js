@@ -1,4 +1,19 @@
-import { SQLiteLexer, SQLiteParserListener, SQLiteParser } from "../ANTLR/index.ts";
+import { SQLiteLexer, SQLiteParserListener, SQLiteParser, CustomListener } from "../ANTLR/index.js";
+import { default as antlr4 } from "antlr4";
+
+function parse(code) {
+	const inputStream = new antlr4.InputStream(code);
+	const lexer = new SQLiteLexer(inputStream);
+	const tokens = new antlr4.CommonTokenStream(lexer);
+	const parser = new SQLiteParser(tokens);
+	parser.buildParseTrees = true;
+	const tree = parser.parse()
+  console.log(tree);
+	const result = [];
+	const listener = new CustomListener(result);
+	antlr4.tree.ParseTreeWalker.DEFAULT.walk(listener, tree);
+	return listener.result;
+}
 
 const code = `
 Select Name, printf('%,d',Bytes) Size,
@@ -11,5 +26,4 @@ WHERE
     AlbumId = 1;
 `;
 
-const parser = new SQLiteParser(code);
-console.log(parser);
+parse(code);
