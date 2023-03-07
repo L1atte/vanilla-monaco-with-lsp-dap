@@ -7,11 +7,12 @@ function parse(code) {
 	const tokens = new antlr4.CommonTokenStream(lexer);
 	const parser = new SQLiteParser(tokens);
 	parser.buildParseTrees = true;
-	const tree = parser.parse()
-  console.log(tree);
+	const tree = parser.sql_stmt_list();
+	console.log(tree);
 	const result = [];
 	const listener = new CustomListener(result);
 	antlr4.tree.ParseTreeWalker.DEFAULT.walk(listener, tree);
+	console.log(listener);
 	return listener.result;
 }
 
