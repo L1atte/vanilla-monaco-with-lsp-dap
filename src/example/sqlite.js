@@ -7,6 +7,7 @@ function parse(code) {
 	const tokens = new antlr4.CommonTokenStream(lexer);
 	const parser = new SQLiteParser(tokens);
 	parser.buildParseTrees = true;
+	console.log(parser);
 	const tree = parser.sql_stmt_list();
 	console.log(tree);
 	const result = [];
