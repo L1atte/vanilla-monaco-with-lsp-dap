@@ -36,7 +36,6 @@
   },
   "dependencies": {
     "antlr4": "4.10.1",
-    "antlr4-autosuggest": "^0.0.28",
     "antlr4ts": "0.5.0-alpha.4",
     "assert": "^2.0.0",
     "express": "~4.18.2",
