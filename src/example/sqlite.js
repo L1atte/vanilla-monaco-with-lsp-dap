@@ -1,19 +1,26 @@
 import { SQLiteLexer, SQLiteParserListener, SQLiteParser, CustomListener } from "../ANTLR/index.js";
 import { default as antlr4 } from "antlr4";
 
+console.log(antlr4);
+
 function parse(code) {
 	const inputStream = new antlr4.InputStream(code);
 	const lexer = new SQLiteLexer(inputStream);
 	const tokens = new antlr4.CommonTokenStream(lexer);
 	const parser = new SQLiteParser(tokens);
 	parser.buildParseTrees = true;
-	console.log(parser);
 	const tree = parser.sql_stmt_list();
-	console.log(tree);
 	const result = [];
 	const listener = new CustomListener(result);
 	antlr4.tree.ParseTreeWalker.DEFAULT.walk(listener, tree);
+
+	console.log(inputStream);
+	console.log(lexer);
+	console.log(tokens);
+	console.log(parser);
+	console.log(tree);
 	console.log(listener);
+	
 	return listener.result;
 }
 

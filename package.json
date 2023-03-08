@@ -12,7 +12,8 @@
     "watch": "webpack --watch",
     "dev": "webpack serve",
     "server": "node server/server.js",
-    "antlr4ts-plsql": "antlr4ts -Xexact-output-dir -o src/ANTLR -package parsers ./PlSqlLexer.g4 ./PlSqlParser.g4"
+    "antlr4ts-plsql": "antlr4ts -Xexact-output-dir -o src/ANTLR -package parsers ./PlSqlLexer.g4 ./PlSqlParser.g4",
+    "antlr4-js": "antlr4ts -Xexact-output-dir -o src/ANTLR2 -package parsers ./JavaScriptLexer.g4 ./JavaScriptParser.g4"
   },
   "keywords": [],
   "author": "",
@@ -36,6 +37,7 @@
   },
   "dependencies": {
     "antlr4": "4.10.1",
+    "antlr4-autosuggest": "^0.0.28",
     "antlr4ts": "0.5.0-alpha.4",
     "assert": "^2.0.0",
     "express": "~4.18.2",

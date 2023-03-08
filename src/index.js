@@ -1,7 +1,8 @@
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api.js";
 // import "./client.js";
-import { parse } from "./parse.js";
-import "./example/sqlite.js";
+// import { parse } from "./parse.js";
+// import "./example/sqlite.js";
+import "./example/auto.js";
 
 const LANGUAGE_ID = "sqlite";
 const MODEL_URI = "inmemory://model.sql";
@@ -59,4 +60,4 @@ monaco.languages.registerHoverProvider(LANGUAGE_ID, {
 });
 
 // 注册 DocumentFormattingEditProvider
-monaco.languages.registerDocumentFormattingEditProvider(LANGUAGE_ID, new FormattingProvider(getInputValue(instance)));
+// monaco.languages.registerDocumentFormattingEditProvider(LANGUAGE_ID, new FormattingProvider(getInputValue(instance)));
