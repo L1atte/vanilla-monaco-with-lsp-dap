@@ -6,6 +6,7 @@ specifiers:
   '@webpack-cli/generators': ^3.0.1
   antlr4: 4.10.1
   antlr4-autosuggest: ^0.0.28
+  antlr4-c3: ^2.2.2
   antlr4ts: 0.5.0-alpha.4
   antlr4ts-cli: 0.5.0-alpha.4
   assert: ^2.0.0
@@ -40,6 +41,7 @@ specifiers:
 dependencies:
   antlr4: 4.10.1
   antlr4-autosuggest: registry.npmmirror.com/antlr4-autosuggest/0.0.28
+  antlr4-c3: registry.npmmirror.com/antlr4-c3/2.2.2
   antlr4ts: 0.5.0-alpha.4
   assert: 2.0.0
   express: 4.18.2
@@ -6328,11 +6330,25 @@ packages:
       - supports-color
     dev: false
 
+  registry.npmmirror.com/antlr4-c3/2.2.2:
+    resolution: {integrity: sha512-J+DkEVaeHxsi02Jer2AbFm6HgiO+rsMN1xBiv6CW9fDxKE+LI5TKDTtH7wmpniRgCSBZkRHM+n1lp1cWlxECYQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/antlr4-c3/-/antlr4-c3-2.2.2.tgz}
+    name: antlr4-c3
+    version: 2.2.2
+    dependencies:
+      antlr4ts: registry.npmmirror.com/antlr4ts/0.5.0-alpha.4
+    dev: false
+
   registry.npmmirror.com/antlr4/4.10.1:
     resolution: {integrity: sha512-fmxidcOwmktzHUD+tz8y/zKLI/NfVAB0+MOvnFUBzo8ToFnphK8JY88oOJeRdhnTrAhjtu45bvxddzbb8nMeIA==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/antlr4/-/antlr4-4.10.1.tgz}
     name: antlr4
     version: 4.10.1
     engines: {node: '>=14'}
+    dev: false
+
+  registry.npmmirror.com/antlr4ts/0.5.0-alpha.4:
+    resolution: {integrity: sha512-WPQDt1B74OfPv/IMS2ekXAKkTZIHl88uMetg6q3OTqgFxZ/dxDXI0EWLyZid/1Pe6hTftyg5N7gel5wNAGxXyQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/antlr4ts/-/antlr4ts-0.5.0-alpha.4.tgz}
+    name: antlr4ts
+    version: 0.5.0-alpha.4
     dev: false
 
   registry.npmmirror.com/debug/3.2.7:
