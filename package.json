@@ -15,6 +15,8 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/react": "^18.0.28",
+    "@types/react-dom": "^18.0.11",
     "@webpack-cli/generators": "^3.0.1",
     "css-loader": "^6.7.3",
     "html-webpack-plugin": "^5.5.0",
@@ -28,6 +30,10 @@
   },
   "dependencies": {
     "assert": "^2.0.0",
+    "monaco-editor": "^0.34.1",
+    "monaco-editor-webpack-plugin": "^7.0.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "sql-autocomplete": "^1.1.1"
   }
 }

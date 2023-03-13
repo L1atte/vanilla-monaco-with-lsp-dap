@@ -2,13 +2,14 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { ProvidePlugin } = require("webpack");
+const MonacoWebpackPlugin = require("monaco-editor-webpack-plugin");
 
 const isProduction = process.env.NODE_ENV == "production";
 
 const stylesHandler = "style-loader";
 
 const config = {
-	entry: "./src/index.ts",
+	entry: "./src/main.tsx",
 	output: {
 		path: path.resolve(__dirname, "dist"),
 	},
@@ -23,7 +24,7 @@ const config = {
 		new ProvidePlugin({
 			process: "process/browser",
 		}),
-
+		new MonacoWebpackPlugin(),
 		// Add your plugins here
 		// Learn more about plugins from https://webpack.js.org/configuration/plugins/
 	],

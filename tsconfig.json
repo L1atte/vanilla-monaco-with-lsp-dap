@@ -1,11 +1,12 @@
 {
-  "compilerOptions": {
-    "allowSyntheticDefaultImports": true,
-    "noImplicitAny": true,
-    "module": "es6",
-    "target": "es5",
-    "allowJs": true,
-    "moduleResolution": "node"
-  },
-  "files": ["src/index.ts"]
+	"compilerOptions": {
+		"allowSyntheticDefaultImports": true,
+		"noImplicitAny": true,
+		"module": "ESNext",
+		"target": "ESNext",
+		"allowJs": true,
+		"moduleResolution": "node",
+		"jsx": "react"
+	},
+	"files": ["src/index.ts"]
 }
