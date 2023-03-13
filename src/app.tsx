@@ -44,7 +44,7 @@ export const ReactMonacoEditor: React.FC<EditorProps> = ({ language }) => {
 					if (!input) return;
 
 					const word = model.getWordUntilPosition(position);
-					const range = new monaco.Range(position.lineNumber, position.lineNumber, word.startColumn, word.endColumn);
+					const range = new monaco.Range(position.lineNumber, word.startColumn, position.lineNumber, word.endColumn);
 
 					const suggestions = generateSuggestion(input, range);
 					return {
