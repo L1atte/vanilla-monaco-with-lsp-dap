@@ -1,6 +1,7 @@
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api.js";
 import React, { createRef, useEffect, useRef } from "react";
 import { SQLAutocomplete, SQLDialect } from "sql-autocomplete";
+import { sqlConf, sqlDef } from "./syntax";
 
 type EditorProps = {
 	language: string;
@@ -16,7 +17,7 @@ function generateSuggestion(value: string, range: monaco.Range) {
 	return [...options].map(option => {
 		return {
 			label: option.value,
-			kind: monaco.languages.CompletionItemKind.Function,
+			kind: option.optionType,
 			insertText: option.value,
 			range: range,
 		};
@@ -35,6 +36,12 @@ export const ReactMonacoEditor: React.FC<EditorProps> = ({ language }) => {
 				extensions: [`.${language}`],
 				aliases: [`${language.toLowerCase()}`, `${language.toUpperCase()}`],
 			});
+
+			// set LanguageConfiguration
+			monaco.languages.setLanguageConfiguration(language, sqlConf);
+
+			// register setMonarchTokens Provider
+			monaco.languages.setMonarchTokensProvider(language, sqlDef);
 
 			// register auto-complete provider
 			monaco.languages.registerCompletionItemProvider(language, {
