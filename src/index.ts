@@ -1,18 +1,19 @@
-import { SQLAutocomplete, SQLDialect } from 'sql-autocomplete';
+// import { CommonTokenStream, CharStreams, Parser, ANTLRErrorListener, ConsoleErrorListener, Lexer } from "antlr4ts";
 
-const sqlAutocomplete = new SQLAutocomplete(SQLDialect.MYSQL);
-const sql1 = 'SELECT * FR';
-const options1 = sqlAutocomplete.autocomplete(sql1);
-console.dir(options1);
+// import { CodeCompletionCore } from "antlr4-c3/out"; // note must add the path "antlr4-c3/out"
 
-// [ AutocompleteOption { value: 'FROM', optionType: 'KEYWORD' } ]
+// let inputStream = CharStreams.fromString("s");
+// let lexer = new SQLiteLexer(inputStream);
+// let tokenStream = new CommonTokenStream(lexer);
 
-const sqlAutocompleteWithNames = new SQLAutocomplete(SQLDialect.MYSQL,
-    ['myDatabaseTableName'], // Optional
-    ['aColumnName']          // Optional
-);
-const sql2 = 'SELECT * FROM myDatabaseTableNa';
-const options2 = sqlAutocompleteWithNames.autocomplete(sql2);
-console.dir(options2);
+// let parser = new SQLiteParser(tokenStream);
+// // let errorListener = new ErrorListener();
+// // parser.addErrorListener(errorListener);
+// console.log('parser', parser);
 
-// [ AutocompleteOption { value: 'myDatabaseTableName', optionType: 'TABLE' } ]
+// // the first method below the Parser Class constructor
+// let tree = parser.parse();
+
+// let core = new CodeCompletionCore(parser);
+// let candidates = core.collectCandidates(0);
+// console.log('candidates', candidates);

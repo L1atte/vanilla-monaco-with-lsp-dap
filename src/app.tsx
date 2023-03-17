@@ -1,7 +1,7 @@
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api.js";
 import React, { createRef, useEffect, useRef } from "react";
 import { SQLAutocomplete, SQLDialect } from "sql-autocomplete";
-import { sqlConf, sqlDef } from "./syntax";
+import { sqlConf, sqlDef } from "./Syntax";
 
 type EditorProps = {
 	language: string;
