@@ -1,4 +1,4 @@
-import { TokenSource, Token, CharStream, TokenFactory, CommonToken } from "antlr4ts-sql";
+import { TokenSource, Token, CharStream, TokenFactory, CommonToken } from "antlr4ts";
 
 export class SimpleSQLTokenizer implements TokenSource {
 
@@ -19,8 +19,8 @@ export class SimpleSQLTokenizer implements TokenSource {
   }
 
   nextToken(): Token {
-    let start = null;
-    let stop = null;
+    let start: number | null = null;
+    let stop: number | null = null;
     const notWhitespaceRegex = /[^\s]/;
     while (this._currentIndex < this.value.length) {
       const currentChar = this.value[this._currentIndex];
@@ -44,11 +44,11 @@ export class SimpleSQLTokenizer implements TokenSource {
       }
       if (start !== null && stop !== null) {
         this._currentIndex++;
-        return new CommonToken(Token.DEFAULT_CHANNEL, this.value.substring(start, stop + 1), {}, null, start, stop);
+        return new CommonToken(Token.DEFAULT_CHANNEL, this.value.substring(start, stop + 1), {}, undefined, start, stop);
       }
       if (this.specialCharacters.includes(currentChar) && !this._insideQuote) {
         this._currentIndex++;
-        return new CommonToken(Token.DEFAULT_CHANNEL, currentChar, {}, null, this._currentIndex - 1, this._currentIndex - 1);
+        return new CommonToken(Token.DEFAULT_CHANNEL, currentChar, {}, undefined, this._currentIndex - 1, this._currentIndex - 1);
       }
       this._currentIndex++;
     }

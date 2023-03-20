@@ -2,7 +2,7 @@
 
 ## src
 
-- ### ANTLR
+- ### grammar-output
 
   antlr 语法解析文件的输出目录
 

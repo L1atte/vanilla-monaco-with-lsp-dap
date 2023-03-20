@@ -1,11 +1,8 @@
 import { CommonTokenStream, CharStreams, Parser, ANTLRErrorListener, ConsoleErrorListener, Lexer } from "antlr4ts";
 import { ParseTree } from "antlr4ts/tree";
-import { SQLiteLexer } from '../ANTLR/SQLiteLexer'
-import { SQLiteParser } from '../ANTLR/SQLiteParser';
-
-enum SQLDialect {
-  SQLite = "SQLite",
-}
+import { SQLiteLexer } from '../grammar-output/SQLiteLexer'
+import { SQLiteParser } from '../grammar-output/SQLiteParser';
+import { SQLDialect } from "./SQLDialect";
 
 export class SQLCore {
   private dialect: SQLDialect

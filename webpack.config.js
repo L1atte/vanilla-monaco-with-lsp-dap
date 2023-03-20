@@ -52,6 +52,7 @@ const config = {
 		extensions: [".tsx", ".ts", ".jsx", ".js", "..."],
 		fallback: {
 			fs: false,
+			"process/browser": require.resolve("process/browser"),
 		},
 	},
 };
