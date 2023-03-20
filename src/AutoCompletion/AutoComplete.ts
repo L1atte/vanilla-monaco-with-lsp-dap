@@ -1,9 +1,9 @@
-import { CommonTokenStream, CharStreams, Parser, ANTLRErrorListener, ConsoleErrorListener, Lexer, Token } from "antlr4ts";
+import { CommonTokenStream, Parser, Token } from "antlr4ts";
 import { PredictionMode } from 'antlr4ts/atn'
 import { SQLCore, SQLDialect } from "../SQLCore";
 import { CodeCompletionCore } from "antlr4-c3/out";
 import { AutocompleteOption, SimpleSQLTokenizer, AutocompleteOptionType } from "../Model";
-import { MySQLGrammar, PLpgSQLGrammar, PlSQLGrammar, TSQLGrammar, SQLiteGrammar } from '../grammar-output'
+import { MySQLGrammar, PLpgSQLGrammar, PlSQLGrammar, TSQLGrammar } from '../grammar-output'
 
 export class SQLAutocomplete {
 
