@@ -9,11 +9,8 @@ type EditorProps = {
 };
 
 function generateSuggestion(value: string, range: monaco.Range) {
-	console.log(value, range);
-
 	const sqlAutocomplete = new SQLAutocomplete(SQLDialect.MYSQL);
 	const options = sqlAutocomplete.autocomplete(value);
-	console.log(options);
 
 	return [...options].map(option => {
 		return {

@@ -1,9 +1,10 @@
-import { CommonTokenStream, Parser, Token } from "antlr4ts";
+import { CommonTokenStream, Parser, Token, ANTLRErrorListener } from "antlr4ts";
 import { PredictionMode } from 'antlr4ts/atn'
 import { SQLCore, SQLDialect } from "../SQLCore";
 import { CodeCompletionCore } from "antlr4-c3/out";
 import { AutocompleteOption, SimpleSQLTokenizer, AutocompleteOptionType } from "../Model";
 import { MySQLGrammar, PLpgSQLGrammar, PlSQLGrammar, TSQLGrammar } from '../grammar-output'
+import { ErrorListener } from "../ErrorHandler/ErrorListener";
 
 export class SQLAutocomplete {
 
@@ -31,9 +32,10 @@ export class SQLAutocomplete {
       sqlScript = sqlScript.substring(0, atIndex);
     }
 
-    const tokens = this._getTokens(sqlScript);
-    const parser = this._getParser(tokens);
-    const core = new CodeCompletionCore(parser);
+    const errorListener = new ErrorListener()
+    const tokens = this._getTokens(sqlScript, [errorListener]);
+    const parser = this._getParser(tokens, [errorListener]);
+    const core = new CodeCompletionCore(parser); // antlr4-c3
     const preferredRulesTable = this._getPreferredRulesForTable();
     const preferredRulesColumn = this._getPreferredRulesForColumn();
     const preferredRuleOptions = [preferredRulesTable, preferredRulesColumn];
@@ -130,13 +132,13 @@ export class SQLAutocomplete {
     }
   }
 
-  _getTokens(sqlScript: string): CommonTokenStream {
-    const tokens = this.SQLCore.getTokens(sqlScript, []);
+  _getTokens(sqlScript: string, errorListeners?: ANTLRErrorListener<any>[]): CommonTokenStream {
+    const tokens = this.SQLCore.getTokens(sqlScript, errorListeners ?? []);
     return tokens;
   }
 
-  _getParser(tokens: CommonTokenStream): Parser {
-    let parser = this.SQLCore.getParser(tokens, []);
+  _getParser(tokens: CommonTokenStream, errorListeners?: ANTLRErrorListener<any>[]): Parser {
+    let parser = this.SQLCore.getParser(tokens, errorListeners ?? []);
     parser.interpreter.setPredictionMode(PredictionMode.LL);
     return parser;
   }

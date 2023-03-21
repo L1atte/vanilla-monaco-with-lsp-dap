@@ -16,6 +16,7 @@ export class SQLCore {
   getTokens(sqlScript: string, errorListeners?: ANTLRErrorListener<any>[]): CommonTokenStream {
     const chars = CharStreams.fromString(sqlScript);
     let lexer: Lexer | null = null;
+
     if (this.dialect === SQLDialect.TSQL) {
       lexer = new TSqlLexer(chars);
     } else if (this.dialect === SQLDialect.PLSQL) {
@@ -25,8 +26,9 @@ export class SQLCore {
     } else if (this.dialect === SQLDialect.MYSQL) {
       lexer = new MySQLLexer(chars);
     }
+
     if (errorListeners !== null && errorListeners !== undefined && lexer) {
-      lexer.removeErrorListener(ConsoleErrorListener.INSTANCE);
+      lexer.removeErrorListeners();
       for (const listener of errorListeners) {
         lexer.addErrorListener(listener);
       }
@@ -48,9 +50,15 @@ export class SQLCore {
     } else if (this.dialect === SQLDialect.MYSQL) {
       parser = new MultiQueryMySQLParser(tokens);
     }
+
     if (errorListeners !== null && errorListeners !== undefined && parser) {
-      parser.removeErrorListener(ConsoleErrorListener.INSTANCE);
+      console.log('remove', errorListeners);
+      
+      // parser.removeErrorListener(ConsoleErrorListener.INSTANCE);
+      parser.removeErrorListeners();
       for (const listener of errorListeners) {
+        console.log('add');
+        
         parser.addErrorListener(listener);
       }
       return parser
