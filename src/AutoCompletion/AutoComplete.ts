@@ -9,6 +9,7 @@ import { ErrorListener } from "../ErrorHandler/ErrorListener";
 export class SQLAutocomplete {
 
   dialect: SQLDialect;
+  errorListener: ErrorListener
   SQLCore: SQLCore;
 
   tableNames: string[] = [];
@@ -16,6 +17,7 @@ export class SQLAutocomplete {
 
   constructor(dialect: SQLDialect, tableNames?: string[], columnNames?: string[]) {
     this.dialect = dialect;
+    this.errorListener = new ErrorListener()
     this.SQLCore = new SQLCore(this.dialect);
     if (tableNames !== null && tableNames !== undefined) {
       this.tableNames.push(...tableNames);
@@ -32,9 +34,8 @@ export class SQLAutocomplete {
       sqlScript = sqlScript.substring(0, atIndex);
     }
 
-    const errorListener = new ErrorListener()
-    const tokens = this._getTokens(sqlScript, [errorListener]);
-    const parser = this._getParser(tokens, [errorListener]);
+    const tokens = this._getTokens(sqlScript, [this.errorListener]);
+    const parser = this._getParser(tokens, [this.errorListener]);
     const core = new CodeCompletionCore(parser); // antlr4-c3
     const preferredRulesTable = this._getPreferredRulesForTable();
     const preferredRulesColumn = this._getPreferredRulesForColumn();
@@ -118,6 +119,10 @@ export class SQLAutocomplete {
       }
     }
     return autocompleteOptions;
+  }
+
+  getError() {
+    return this.errorListener.getErrors()
   }
 
   setTableNames(tableNames: string[]): void {

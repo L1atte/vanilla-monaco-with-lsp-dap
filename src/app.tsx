@@ -12,14 +12,17 @@ function generateSuggestion(value: string, range: monaco.Range) {
 	const sqlAutocomplete = new SQLAutocomplete(SQLDialect.MYSQL);
 	const options = sqlAutocomplete.autocomplete(value);
 
-	return [...options].map(option => {
-		return {
-			label: option.value,
-			kind: option.optionType,
-			insertText: option.value,
-			range: range,
-		};
-	});
+	return {
+		suggestions: [...options].map(option => {
+			return {
+				label: option.value,
+				kind: option.optionType,
+				insertText: option.value,
+				range: range,
+			};
+		}),
+		error: sqlAutocomplete.getError(),
+	};
 }
 
 export const ReactMonacoEditor: React.FC<EditorProps> = ({ language }) => {
@@ -51,7 +54,7 @@ export const ReactMonacoEditor: React.FC<EditorProps> = ({ language }) => {
 					const word = model.getWordUntilPosition(position);
 					const range = new monaco.Range(position.lineNumber, word.startColumn, position.lineNumber, word.endColumn);
 
-					const suggestions = generateSuggestion(input, range);
+					const { suggestions } = generateSuggestion(input, range);
 					return {
 						suggestions,
 					};
@@ -67,6 +70,24 @@ export const ReactMonacoEditor: React.FC<EditorProps> = ({ language }) => {
 				},
 				automaticLayout: true,
 			});
+
+			editorRef.current.getModel();
+
+			// add the error markers and underline
+			const { error } = generateSuggestion(editorRef.current.getValue(), new monaco.Range(1, 1, 1, 1));
+			monaco.editor.setModelMarkers(
+				editorRef.current.getModel()!,
+				language,
+				error.map(e => {
+					console.log("in");
+
+					return {
+						...e,
+						severity: monaco.MarkerSeverity.Error,
+					};
+				}),
+			);
+
 			return () => {
 				editorRef.current!.dispose();
 			};

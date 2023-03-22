@@ -1,31 +1,33 @@
-// import { CommonTokenStream, CharStreams, Parser, ANTLRErrorListener, ConsoleErrorListener, Lexer } from "antlr4ts";
+// import { CommonTokenStream, CharStreams, Parser, ANTLRErrorListener, ConsoleErrorListener, Lexer, Recognizer, RecognitionException } from "antlr4ts";
 // import { CodeCompletionCore } from "antlr4-c3/out"; // note must add the path "antlr4-c3/out"
-// import { SQLiteLexer } from './grammar-output/SQLiteLexer'
-// import { SQLiteParser } from './grammar-output/SQLiteParser';
+// import { SQLiteLexer } from './grammar-output/sqlite/SQLiteLexer'
+// import { SQLiteParser } from './grammar-output/sqlite/SQLiteParser';
 
-// // let inputStream = CharStreams.fromString("s");
-// // let lexer = new SQLiteLexer(inputStream);
-// // let tokenStream = new CommonTokenStream(lexer);
+// class TodoLangErrorListener implements ANTLRErrorListener<any>{
+//   syntaxError(recognizer: Recognizer<any, any>, offendingSymbol: any, line: number, charPositionInLine: number, message: string, e: RecognitionException | undefined): void {
+//     console.log('error');
+//     console.log(recognizer);
+//     console.log(offendingSymbol);
+//     console.log(line);
+//     console.log(charPositionInLine);
+//     console.log(message);
+//   }
 
-// // let parser = new SQLiteParser(tokenStream);
-// // // let errorListener = new ErrorListener();
-// // // parser.addErrorListener(errorListener);
-// // console.log('parser', parser);
+// }
 
-// // // the first method below the Parser Class constructor
-// // let tree = parser.parse();
-
-// // let core = new CodeCompletionCore(parser);
-// // let candidates = core.collectCandidates(0);
-// // console.log('candidates', candidates);
-// let inputStream = CharStreams.fromString("SE");
+// let errorHandler = new TodoLangErrorListener()
+// let inputStream = CharStreams.fromString("select * from 123");
 // let lexer = new SQLiteLexer(inputStream);
+
+// lexer.removeErrorListeners()
+// lexer.addErrorListener(errorHandler)
+// console.log('lexer', lexer);
+
 // let tokenStream = new CommonTokenStream(lexer);
 
-// let parser = new SQLiteParser(tokenStream);
-// let tree = parser.parse();
+// let parser = new SQLiteParser(tokenStream)
 
-// let core = new CodeCompletionCore(parser);
-// let candidates = core.collectCandidates(0);
-// console.log(candidates);
+// parser.removeErrorListeners()
+// parser.addErrorListener(errorHandler)
 
+// console.log("1", parser.parse());

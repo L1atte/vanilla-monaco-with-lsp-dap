@@ -6,7 +6,6 @@ import { MultiQueryMySQLParser } from '../grammar-output/mysql/MultiQueryMySQLPa
 import { TSqlParser } from '../grammar-output/tsql/TSqlParser'
 import { PlSqlParser } from '../grammar-output/plsql/PlSqlParser'
 import { PLpgSQLParser } from '../grammar-output/plpgsql/PLpgSQLParser'
-import { ErrorListener } from "../ErrorHandler";
 export class SQLCore {
   dialect: SQLDialect;
 
@@ -18,14 +17,21 @@ export class SQLCore {
     const chars = CharStreams.fromString(sqlScript);
     let lexer: Lexer | null = null;
 
-    if (this.dialect === SQLDialect.TSQL) {
-      lexer = new TSqlLexer(chars);
-    } else if (this.dialect === SQLDialect.PLSQL) {
-      lexer = new PlSqlLexer(chars);
-    } else if (this.dialect === SQLDialect.PLpgSQL) {
-      lexer = new PLpgSQLLexer(chars);
-    } else if (this.dialect === SQLDialect.MYSQL) {
-      lexer = new MySQLLexer(chars);
+    switch (this.dialect) {
+      case SQLDialect.TSQL:
+        lexer = new TSqlLexer(chars)
+        break
+      case SQLDialect.PLSQL:
+        lexer = new PlSqlLexer(chars);
+        break
+      case SQLDialect.PLpgSQL:
+        lexer = new PLpgSQLLexer(chars);
+        break
+      case SQLDialect.MYSQL:
+        lexer = new MySQLLexer(chars)
+        break
+      default:
+        break
     }
 
     if (lexer) {
@@ -44,14 +50,22 @@ export class SQLCore {
 
   getParser(tokens: CommonTokenStream, errorListeners?: ANTLRErrorListener<any>[]): Parser {
     let parser: Parser | null = null;
-    if (this.dialect === SQLDialect.TSQL) {
-      parser = new TSqlParser(tokens);
-    } else if (this.dialect === SQLDialect.PLSQL) {
-      parser = new PlSqlParser(tokens);
-    } else if (this.dialect === SQLDialect.PLpgSQL) {
-      parser = new PLpgSQLParser(tokens);
-    } else if (this.dialect === SQLDialect.MYSQL) {
-      parser = new MultiQueryMySQLParser(tokens);
+
+    switch (this.dialect) {
+      case SQLDialect.TSQL:
+        parser = new TSqlParser(tokens)
+        break
+      case SQLDialect.PLSQL:
+        parser = new PlSqlParser(tokens);
+        break
+      case SQLDialect.PLpgSQL:
+        parser = new PLpgSQLParser(tokens);
+        break
+      case SQLDialect.MYSQL:
+        parser = new MultiQueryMySQLParser(tokens)
+        break
+      default:
+        break
     }
 
     if (parser) {
