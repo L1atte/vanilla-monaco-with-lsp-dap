@@ -6,6 +6,7 @@ import { MultiQueryMySQLParser } from '../grammar-output/mysql/MultiQueryMySQLPa
 import { TSqlParser } from '../grammar-output/tsql/TSqlParser'
 import { PlSqlParser } from '../grammar-output/plsql/PlSqlParser'
 import { PLpgSQLParser } from '../grammar-output/plpgsql/PLpgSQLParser'
+import { ErrorListener } from "../ErrorHandler";
 export class SQLCore {
   dialect: SQLDialect;
 
@@ -27,10 +28,12 @@ export class SQLCore {
       lexer = new MySQLLexer(chars);
     }
 
-    if (errorListeners !== null && errorListeners !== undefined && lexer) {
-      lexer.removeErrorListeners();
-      for (const listener of errorListeners) {
-        lexer.addErrorListener(listener);
+    if (lexer) {
+      if (errorListeners != null) {
+        lexer.removeErrorListeners();
+        for (const listener of errorListeners) {
+          lexer.addErrorListener(listener);
+        }
       }
       const tokens = new CommonTokenStream(lexer);
       return tokens;
@@ -51,15 +54,12 @@ export class SQLCore {
       parser = new MultiQueryMySQLParser(tokens);
     }
 
-    if (errorListeners !== null && errorListeners !== undefined && parser) {
-      console.log('remove', errorListeners);
-      
-      // parser.removeErrorListener(ConsoleErrorListener.INSTANCE);
-      parser.removeErrorListeners();
-      for (const listener of errorListeners) {
-        console.log('add');
-        
-        parser.addErrorListener(listener);
+    if (parser) {
+      if (errorListeners != null) {
+        parser.removeErrorListeners();
+        for (const listener of errorListeners) {
+          parser.addErrorListener(listener);
+        }
       }
       return parser
     }
