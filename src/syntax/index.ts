@@ -1,1 +1,1 @@
-export { sqlConf, sqlDef } from './sql'
+export { sqlConf, sqlDef } from "./sql";
