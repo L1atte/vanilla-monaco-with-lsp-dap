@@ -10,10 +10,12 @@ type EditorProps = {
 
 function generateSuggestion(value: string, range: monaco.Range) {
 	const sqlAutocomplete = new SQLAutocomplete(SQLDialect.MYSQL);
-	const options = sqlAutocomplete.autocomplete(value);
+	const { suggestions, errors } = sqlAutocomplete.parse(value);
+
+	console.log(errors);
 
 	return {
-		suggestions: [...options].map(option => {
+		suggestions: [...suggestions].map(option => {
 			return {
 				label: option.value,
 				kind: option.optionType,
@@ -21,7 +23,6 @@ function generateSuggestion(value: string, range: monaco.Range) {
 				range: range,
 			};
 		}),
-		error: sqlAutocomplete.getError(),
 	};
 }
 
@@ -74,23 +75,23 @@ export const ReactMonacoEditor: React.FC<EditorProps> = ({ language }) => {
 			editorRef.current.getModel();
 
 			// add the error markers and underline
-			editorRef.current.onDidChangeModelContent(function () {
-				const { error } = generateSuggestion(editorRef.current?.getValue()!, new monaco.Range(1, 1, 1, 1));
-				const monacoErrors: monaco.editor.IMarkerData[] = [];
-				for (const e of error) {
-					monacoErrors.push({
-						startLineNumber: e.startLineNumber,
-						startColumn: e.startColumn,
-						endLineNumber: e.endLineNumber,
-						endColumn: e.endColumn,
-						message: e.message,
-						severity: monaco.MarkerSeverity.Error,
-					});
-				}
-				console.log("in", monacoErrors);
-				const model = editorRef.current?.getModel();
-				monaco.editor.setModelMarkers(model!, language, monacoErrors);
-			});
+			// editorRef.current.onDidChangeModelContent(function () {
+			// 	const { error } = generateSuggestion(editorRef.current?.getValue()!, new monaco.Range(1, 1, 1, 1));
+			// 	const monacoErrors: monaco.editor.IMarkerData[] = [];
+			// 	for (const e of error) {
+			// 		monacoErrors.push({
+			// 			startLineNumber: e.startLineNumber,
+			// 			startColumn: e.startColumn,
+			// 			endLineNumber: e.endLineNumber,
+			// 			endColumn: e.endColumn,
+			// 			message: e.message,
+			// 			severity: monaco.MarkerSeverity.Error,
+			// 		});
+			// 	}
+			// 	console.log("in", monacoErrors);
+			// 	const model = editorRef.current?.getModel();
+			// 	monaco.editor.setModelMarkers(model!, language, monacoErrors);
+			// });
 
 			return () => {
 				editorRef.current!.dispose();

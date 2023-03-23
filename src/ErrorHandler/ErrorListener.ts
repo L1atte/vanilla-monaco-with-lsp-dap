@@ -10,8 +10,10 @@ export interface IError {
   code: string;
 }
 export class ErrorListener implements ANTLRErrorListener<any>{
-  private errors: IError[] = []
+  errors: IError[] = []
   syntaxError(recognizer: Recognizer<any, any>, offendingSymbol: any, line: number, charPositionInLine: number, message: string, e: RecognitionException | undefined): void {
+    console.log('has error');
+
     this.errors.push(
       {
         startLineNumber: line,

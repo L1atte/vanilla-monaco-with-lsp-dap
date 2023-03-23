@@ -4,7 +4,12 @@ import { SQLCore, SQLDialect } from "../SQLCore";
 import { CodeCompletionCore } from "antlr4-c3/out";
 import { AutocompleteOption, SimpleSQLTokenizer, AutocompleteOptionType } from "../Model";
 import { MySQLGrammar, PLpgSQLGrammar, PlSQLGrammar, TSQLGrammar } from '../grammar-output'
-import { ErrorListener } from "../ErrorHandler/ErrorListener";
+import { ErrorListener, IError } from "../ErrorHandler/ErrorListener";
+
+type ParseResult = {
+  suggestions: AutocompleteOption[]
+  errors: IError[]
+}
 
 export class SQLAutocomplete {
 
@@ -27,16 +32,17 @@ export class SQLAutocomplete {
     }
   }
 
-  autocomplete(sqlScript: string, atIndex?: number): AutocompleteOption[] {
+  parse(sqlScript: string, atIndex?: number): ParseResult {
     if (atIndex !== undefined && atIndex !== null) {
       // Remove everything after the index we want to get suggestions for,
       // it's not needed and keeping it in may impact which token gets selected for prediction    
       sqlScript = sqlScript.substring(0, atIndex);
     }
 
-    const tokens = this._getTokens(sqlScript, [this.errorListener]);
-    const parser = this._getParser(tokens, [this.errorListener]);
+    const tokens = this._getTokens(sqlScript, this.errorListener);
+    const parser = this._getParser(tokens, this.errorListener);
     const core = new CodeCompletionCore(parser); // antlr4-c3
+
     const preferredRulesTable = this._getPreferredRulesForTable();
     const preferredRulesColumn = this._getPreferredRulesForColumn();
     const preferredRuleOptions = [preferredRulesTable, preferredRulesColumn];
@@ -49,13 +55,18 @@ export class SQLAutocomplete {
     const simpleSQLTokenizer = new SimpleSQLTokenizer(sqlScript, this._tokenizeWhitespace());
     const allTokens = new CommonTokenStream(simpleSQLTokenizer);
     const tokenIndex = this._getTokenIndexAt(allTokens.getTokens(), sqlScript, indexToAutocomplete);
+
     if (tokenIndex === null) {
-      return [];
+      return {
+        suggestions: [],
+        errors: [],
+      };
     }
+
     const token: any = allTokens.getTokens()[tokenIndex];
     const tokenString = this._getTokenString(token, sqlScript, indexToAutocomplete);
     tokens.fill(); // Needed for CoreCompletionCore to process correctly, see: https://github.com/mike-lischke/antlr4-c3/issues/42
-    const autocompleteOptions: AutocompleteOption[] = [];
+    const suggestions: AutocompleteOption[] = [];
     // Depending on the SQL grammar, we may not get both Tables and Column rules,
     // even if both are viable options for autocompletion
     // So, instead of using all preferredRules at once, we'll do them separate
@@ -83,8 +94,8 @@ export class SQLAutocomplete {
           }
           candidateTokenValue += followOnTokenValue;
         }
-        if (tokenString.length === 0 || (candidateTokenValue.startsWith(tokenString.toUpperCase()) && autocompleteOptions.find(option => option.value === candidateTokenValue) === undefined)) {
-          autocompleteOptions.push(new AutocompleteOption(candidateTokenValue, AutocompleteOptionType.KEYWORD));
+        if (tokenString.length === 0 || (candidateTokenValue.startsWith(tokenString.toUpperCase()) && suggestions.find(option => option.value === candidateTokenValue) === undefined)) {
+          suggestions.push(new AutocompleteOption(candidateTokenValue, AutocompleteOptionType.KEYWORD));
         }
       }
       for (const rule of candidates.rules) {
@@ -99,26 +110,31 @@ export class SQLAutocomplete {
     if (isTableCandidatePosition) {
       for (const tableName of this.tableNames) {
         if (tableName.toUpperCase().startsWith(tokenString.toUpperCase())) {
-          autocompleteOptions.unshift(new AutocompleteOption(tableName, AutocompleteOptionType.TABLE));
+          suggestions.unshift(new AutocompleteOption(tableName, AutocompleteOptionType.TABLE));
         }
       }
-      if (autocompleteOptions.length === 0 || autocompleteOptions[0].optionType !== AutocompleteOptionType.TABLE) {
+      if (suggestions.length === 0 || suggestions[0].optionType !== AutocompleteOptionType.TABLE) {
         // If none of the table options match, still identify this as a potential table location
-        autocompleteOptions.unshift(new AutocompleteOption(null, AutocompleteOptionType.TABLE));
+        suggestions.unshift(new AutocompleteOption(null, AutocompleteOptionType.TABLE));
       }
     }
     if (isColumnCandidatePosition) {
       for (const columnName of this.columnNames) {
         if (columnName.toUpperCase().startsWith(tokenString.toUpperCase())) {
-          autocompleteOptions.unshift(new AutocompleteOption(columnName, AutocompleteOptionType.COLUMN));
+          suggestions.unshift(new AutocompleteOption(columnName, AutocompleteOptionType.COLUMN));
         }
       }
-      if (autocompleteOptions.length === 0 || autocompleteOptions[0].optionType !== AutocompleteOptionType.COLUMN) {
+      if (suggestions.length === 0 || suggestions[0].optionType !== AutocompleteOptionType.COLUMN) {
         // If none of the column options match, still identify this as a potential column location
-        autocompleteOptions.unshift(new AutocompleteOption(null, AutocompleteOptionType.COLUMN));
+        suggestions.unshift(new AutocompleteOption(null, AutocompleteOptionType.COLUMN));
       }
     }
-    return autocompleteOptions;
+
+    const errors = this.errorListener.getErrors()
+    return {
+      suggestions,
+      errors,
+    };
   }
 
   getError() {
@@ -137,13 +153,13 @@ export class SQLAutocomplete {
     }
   }
 
-  _getTokens(sqlScript: string, errorListeners?: ANTLRErrorListener<any>[]): CommonTokenStream {
-    const tokens = this.SQLCore.getTokens(sqlScript, errorListeners ?? []);
+  _getTokens(sqlScript: string, errorListener?: ANTLRErrorListener<any>): CommonTokenStream {
+    const tokens = this.SQLCore.getTokens(sqlScript, errorListener);
     return tokens;
   }
 
-  _getParser(tokens: CommonTokenStream, errorListeners?: ANTLRErrorListener<any>[]): Parser {
-    let parser = this.SQLCore.getParser(tokens, errorListeners ?? []);
+  _getParser(tokens: CommonTokenStream, errorListener?: ANTLRErrorListener<any>): Parser {
+    let parser = this.SQLCore.getParser(tokens, errorListener);
     parser.interpreter.setPredictionMode(PredictionMode.LL);
     return parser;
   }
@@ -301,5 +317,4 @@ export class SQLAutocomplete {
     }
     return '';
   }
-
 }

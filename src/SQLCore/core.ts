@@ -13,7 +13,7 @@ export class SQLCore {
     this.dialect = dialect;
   }
 
-  getTokens(sqlScript: string, errorListeners?: ANTLRErrorListener<any>[]): CommonTokenStream {
+  getTokens(sqlScript: string, errorListener?: ANTLRErrorListener<any>): CommonTokenStream {
     const chars = CharStreams.fromString(sqlScript);
     let lexer: Lexer | null = null;
 
@@ -35,12 +35,11 @@ export class SQLCore {
     }
 
     if (lexer) {
-      if (errorListeners != null) {
+      if (errorListener != null) {
         lexer.removeErrorListeners();
-        for (const listener of errorListeners) {
-          lexer.addErrorListener(listener);
-        }
+        lexer.addErrorListener(errorListener);
       }
+      console.log(lexer.getErrorListeners());
       const tokens = new CommonTokenStream(lexer);
       return tokens;
     }
@@ -48,7 +47,7 @@ export class SQLCore {
     throw new Error('no available lexer')
   }
 
-  getParser(tokens: CommonTokenStream, errorListeners?: ANTLRErrorListener<any>[]): Parser {
+  getParser(tokens: CommonTokenStream, errorListeners?: ANTLRErrorListener<any>): Parser {
     let parser: Parser | null = null;
 
     switch (this.dialect) {
@@ -71,10 +70,9 @@ export class SQLCore {
     if (parser) {
       if (errorListeners != null) {
         parser.removeErrorListeners();
-        for (const listener of errorListeners) {
-          parser.addErrorListener(listener);
-        }
+        parser.addErrorListener(errorListeners);
       }
+      console.log(parser.getErrorListeners());
       return parser
     }
     throw new Error('no available parser')
@@ -94,13 +92,13 @@ export class SQLCore {
     throw new Error('no available parser')
   }
 
-  /*** Convenience Methods ***/
+  // /*** Convenience Methods ***/
 
-  getParserFromSQL(sqlScript: string): Parser {
-    return this.getParser(this.getTokens(sqlScript));
-  }
+  // getParserFromSQL(sqlScript: string): Parser {
+  //   return this.getParser(this.getTokens(sqlScript));
+  // }
 
-  getParseTreeFromSQL(sqlScript: string): ParseTree {
-    return this.getParseTree(this.getParserFromSQL(sqlScript));
-  }
+  // getParseTreeFromSQL(sqlScript: string): ParseTree {
+  //   return this.getParseTree(this.getParserFromSQL(sqlScript));
+  // }
 }
