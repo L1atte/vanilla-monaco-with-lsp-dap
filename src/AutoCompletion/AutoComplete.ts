@@ -6,11 +6,6 @@ import { AutocompleteOption, SimpleSQLTokenizer, AutocompleteOptionType } from "
 import { MySQLGrammar, PLpgSQLGrammar, PlSQLGrammar, TSQLGrammar } from "../grammar-output";
 import { ErrorListener, IError } from "../ErrorHandler/ErrorListener";
 
-type ParseResult = {
-	suggestions: AutocompleteOption[];
-	errors: IError[];
-};
-
 export class SQLAutocomplete {
 	dialect: SQLDialect;
 	errorListener: ErrorListener;
@@ -32,15 +27,15 @@ export class SQLAutocomplete {
 		}
 	}
 
-	parse(sqlScript: string, atIndex?: number): ParseResult {
+	autoComplete(sqlScript: string, atIndex?: number): AutocompleteOption[] {
 		if (atIndex !== undefined && atIndex !== null) {
 			// Remove everything after the index we want to get suggestions for,
 			// it's not needed and keeping it in may impact which token gets selected for prediction
 			sqlScript = sqlScript.substring(0, atIndex);
 		}
 
-		const tokens = this._getTokens(sqlScript, this.errorListener);
-		const parser = this._getParser(tokens, this.errorListener);
+		const tokens = this._getTokens(sqlScript);
+		const parser = this._getParser(tokens);
 		const core = new CodeCompletionCore(parser); // antlr4-c3
 
 		const preferredRulesTable = this._getPreferredRulesForTable();
@@ -57,10 +52,7 @@ export class SQLAutocomplete {
 		const tokenIndex = this._getTokenIndexAt(allTokens.getTokens(), sqlScript, indexToAutocomplete);
 
 		if (tokenIndex === null) {
-			return {
-				suggestions: [],
-				errors: [],
-			};
+			return [];
 		}
 
 		const token: any = allTokens.getTokens()[tokenIndex];
@@ -130,14 +122,15 @@ export class SQLAutocomplete {
 			}
 		}
 
+		return suggestions;
+	}
+
+	validate(sqlScript: string): IError[] {
+		const tokens = this._getTokens(sqlScript, this.errorListener);
+		const parser = this._getParser(tokens, this.errorListener);
 		this.SQLCore.getParseTree(parser);
 		const errors = this.errorListener.getErrors();
-		console.log(errors);
-
-		return {
-			suggestions,
-			errors,
-		};
+		return errors;
 	}
 
 	getError() {

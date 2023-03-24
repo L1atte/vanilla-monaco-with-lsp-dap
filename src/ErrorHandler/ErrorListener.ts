@@ -12,8 +12,6 @@ export interface IError {
 export class ErrorListener implements ANTLRErrorListener<any> {
 	errors: IError[] = [];
 	syntaxError(recognizer: Recognizer<any, any>, offendingSymbol: any, line: number, charPositionInLine: number, message: string, e: RecognitionException | undefined): void {
-		console.log("has error");
-
 		this.errors.push({
 			startLineNumber: line,
 			endLineNumber: line,

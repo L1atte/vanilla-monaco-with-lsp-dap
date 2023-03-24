@@ -39,7 +39,6 @@ export class SQLCore {
 				lexer.removeErrorListeners();
 				lexer.addErrorListener(errorListener);
 			}
-			console.log(lexer.getErrorListeners());
 			const tokens = new CommonTokenStream(lexer);
 			return tokens;
 		}
@@ -72,7 +71,6 @@ export class SQLCore {
 				parser.removeErrorListeners();
 				parser.addErrorListener(errorListeners);
 			}
-			console.log(parser.getErrorListeners());
 			return parser;
 		}
 		throw new Error("no available parser");
