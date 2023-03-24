@@ -1,4 +1,5 @@
 import { CommonTokenStream, Parser, Token, ANTLRErrorListener } from "antlr4ts";
+import { ParseTree } from "antlr4ts/tree";
 import { PredictionMode } from "antlr4ts/atn";
 import { SQLCore, SQLDialect } from "../SQLCore";
 import { CodeCompletionCore } from "antlr4-c3/out";
@@ -6,36 +7,77 @@ import { AutocompleteOption, SimpleSQLTokenizer, AutocompleteOptionType } from "
 import { MySQLGrammar, PLpgSQLGrammar, PlSQLGrammar, TSQLGrammar } from "../grammar-output";
 import { ErrorListener, IError } from "../ErrorHandler/ErrorListener";
 
+/**
+ * inputCtx
+ *
+ * inputStream
+ *
+ * lexer
+ *
+ * tokens Stream
+ *
+ * parser
+ *
+ *
+ * SYNTAX ERROR
+ * add listener after lexer and parser
+ * get result after do parse
+ *
+ *
+ * AUTO-COMPLETE
+ * get core after
+ */
+
+type ParseResult = {
+	tokens: CommonTokenStream;
+	parser: Parser;
+	parseTree: ParseTree;
+	errorListener: ErrorListener;
+};
+
 export class SQLAutocomplete {
 	dialect: SQLDialect;
 	errorListener: ErrorListener;
 	SQLCore: SQLCore;
 
-	tableNames: string[] = [];
-	columnNames: string[] = [];
+	tableInfo: {
+		tableNames: string[];
+		columnNames: string[];
+	};
 
-	constructor(dialect: SQLDialect, tableNames?: string[], columnNames?: string[]) {
+	constructor(dialect: SQLDialect, errorListener?: ErrorListener, tableInfo?: { tableNames?: string[]; columnNames?: string[] }) {
 		this.dialect = dialect;
-		this.errorListener = new ErrorListener();
 		this.SQLCore = new SQLCore(this.dialect);
-		if (tableNames !== null && tableNames !== undefined) {
-			this.tableNames.push(...tableNames);
+		this.errorListener = errorListener ? errorListener : new ErrorListener();
+		if (tableInfo?.tableNames != null) {
+			this.tableInfo.tableNames.push(...tableInfo.tableNames);
 		}
-		0;
-		if (columnNames !== null && columnNames !== undefined) {
-			this.columnNames.push(...columnNames);
+		if (tableInfo?.columnNames != null) {
+			this.tableInfo.columnNames.push(...tableInfo.columnNames);
 		}
 	}
 
-	autoComplete(sqlScript: string, atIndex?: number): AutocompleteOption[] {
-		if (atIndex !== undefined && atIndex !== null) {
+	parse(inputCtx: string, atIndex?: number): ParseResult {
+		if (atIndex != null) {
 			// Remove everything after the index we want to get suggestions for,
 			// it's not needed and keeping it in may impact which token gets selected for prediction
-			sqlScript = sqlScript.substring(0, atIndex);
+			inputCtx = inputCtx.substring(0, atIndex);
 		}
 
-		const tokens = this._getTokens(sqlScript);
-		const parser = this._getParser(tokens);
+		const tokens = this._getTokens(inputCtx, this.errorListener);
+		const parser = this._getParser(tokens, this.errorListener);
+		const parseTree = this._getParseTree(parser);
+
+		return {
+			tokens,
+			parser,
+			parseTree,
+			errorListener: this.errorListener,
+		};
+	}
+
+	autoComplete(inputCtx: string, atIndex?: number): AutocompleteOption[] {
+		const { tokens, parser } = this.parse(inputCtx);
 		const core = new CodeCompletionCore(parser); // antlr4-c3
 
 		const preferredRulesTable = this._getPreferredRulesForTable();
@@ -43,20 +85,20 @@ export class SQLAutocomplete {
 		const preferredRuleOptions = [preferredRulesTable, preferredRulesColumn];
 		const ignoreTokens = this._getTokensToIgnore();
 		core.ignoredTokens = new Set(ignoreTokens);
-		let indexToAutocomplete = sqlScript.length;
+		let indexToAutocomplete = inputCtx.length;
 		if (atIndex !== null && atIndex !== undefined) {
 			indexToAutocomplete = atIndex;
 		}
-		const simpleSQLTokenizer = new SimpleSQLTokenizer(sqlScript, this._tokenizeWhitespace());
+		const simpleSQLTokenizer = new SimpleSQLTokenizer(inputCtx, this._tokenizeWhitespace());
 		const allTokens = new CommonTokenStream(simpleSQLTokenizer);
-		const tokenIndex = this._getTokenIndexAt(allTokens.getTokens(), sqlScript, indexToAutocomplete);
+		const tokenIndex = this._getTokenIndexAt(allTokens.getTokens(), inputCtx, indexToAutocomplete);
 
 		if (tokenIndex === null) {
 			return [];
 		}
 
 		const token: any = allTokens.getTokens()[tokenIndex];
-		const tokenString = this._getTokenString(token, sqlScript, indexToAutocomplete);
+		const tokenString = this._getTokenString(token, inputCtx, indexToAutocomplete);
 		tokens.fill(); // Needed for CoreCompletionCore to process correctly, see: https://github.com/mike-lischke/antlr4-c3/issues/42
 		const suggestions: AutocompleteOption[] = [];
 		// Depending on the SQL grammar, we may not get both Tables and Column rules,
@@ -100,7 +142,7 @@ export class SQLAutocomplete {
 			}
 		}
 		if (isTableCandidatePosition) {
-			for (const tableName of this.tableNames) {
+			for (const tableName of this.tableInfo.tableNames) {
 				if (tableName.toUpperCase().startsWith(tokenString.toUpperCase())) {
 					suggestions.unshift(new AutocompleteOption(tableName, AutocompleteOptionType.TABLE));
 				}
@@ -111,7 +153,7 @@ export class SQLAutocomplete {
 			}
 		}
 		if (isColumnCandidatePosition) {
-			for (const columnName of this.columnNames) {
+			for (const columnName of this.tableInfo.columnNames) {
 				if (columnName.toUpperCase().startsWith(tokenString.toUpperCase())) {
 					suggestions.unshift(new AutocompleteOption(columnName, AutocompleteOptionType.COLUMN));
 				}
@@ -125,32 +167,26 @@ export class SQLAutocomplete {
 		return suggestions;
 	}
 
-	validate(sqlScript: string): IError[] {
-		const tokens = this._getTokens(sqlScript, this.errorListener);
-		const parser = this._getParser(tokens, this.errorListener);
-		this.SQLCore.getParseTree(parser);
-		const errors = this.errorListener.getErrors();
+	validate(inputCtx: string): IError[] {
+		const { errorListener } = this.parse(inputCtx);
+		const errors = errorListener.getErrors();
 		return errors;
-	}
-
-	getError() {
-		return this.errorListener.getErrors();
 	}
 
 	setTableNames(tableNames: string[]): void {
 		if (tableNames !== null && tableNames !== undefined) {
-			this.tableNames = [...tableNames];
+			this.tableInfo.tableNames = [...tableNames];
 		}
 	}
 
 	setColumnNames(columnNames: string[]): void {
 		if (columnNames !== null && columnNames !== undefined) {
-			this.columnNames = [...columnNames];
+			this.tableInfo.columnNames = [...columnNames];
 		}
 	}
 
-	_getTokens(sqlScript: string, errorListener?: ANTLRErrorListener<any>): CommonTokenStream {
-		const tokens = this.SQLCore.getTokens(sqlScript, errorListener);
+	_getTokens(inputCtx: string, errorListener?: ANTLRErrorListener<any>): CommonTokenStream {
+		const tokens = this.SQLCore.getTokens(inputCtx, errorListener);
 		return tokens;
 	}
 
@@ -158,6 +194,10 @@ export class SQLAutocomplete {
 		let parser = this.SQLCore.getParser(tokens, errorListener);
 		parser.interpreter.setPredictionMode(PredictionMode.LL);
 		return parser;
+	}
+
+	_getParseTree(parser: Parser): ParseTree {
+		return this.SQLCore.getParseTree(parser);
 	}
 
 	_tokenizeWhitespace() {

@@ -89,14 +89,4 @@ export class SQLCore {
 
 		throw new Error("no available parser");
 	}
-
-	// /*** Convenience Methods ***/
-
-	// getParserFromSQL(sqlScript: string): Parser {
-	//   return this.getParser(this.getTokens(sqlScript));
-	// }
-
-	// getParseTreeFromSQL(sqlScript: string): ParseTree {
-	//   return this.getParseTree(this.getParserFromSQL(sqlScript));
-	// }
 }
