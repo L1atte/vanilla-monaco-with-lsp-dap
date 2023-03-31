@@ -18,7 +18,7 @@
 
 - ### Auto-Completion
 
-  词法填充模块，提供根据当前输入和输入位置的输入建议
+  词法填充模块，计算基于当前输入的代码建议，对外输出符合 `Monaco-completion`协议的代码补全内容
 
 - ### Error-Handler
 
