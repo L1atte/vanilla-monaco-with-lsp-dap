@@ -1,0 +1,77 @@
+<mxfile host="65bd71144e" scale="1" border="0">
+    <diagram id="QB4kDGnan6O2wUZlVeOT" name="Page-1">
+        <mxGraphModel dx="1201" dy="1642" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" background="#ffffff" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="3" style="edgeStyle=none;html=1;" parent="1" source="4" target="6" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="4" value="&lt;h2&gt;词法分析器&lt;/h2&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="210" y="-595" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="5" style="edgeStyle=none;html=1;entryX=0.5;entryY=-0.015;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="6" target="12" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="6" value="&lt;h2&gt;语法分析器&lt;/h2&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="210" y="-435" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="7" style="edgeStyle=none;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=0;exitY=0;exitDx=270;exitDy=75;exitPerimeter=0;" parent="1" source="12" target="20" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="8" style="edgeStyle=none;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=0;exitY=0;exitDx=270;exitDy=75;exitPerimeter=0;" parent="1" source="12" target="21" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="9" style="edgeStyle=none;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=0;exitY=0;exitDx=270;exitDy=75;exitPerimeter=0;" parent="1" source="12" target="22" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="470" y="-95" as="sourcePoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="11" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="12" target="24" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="12" value="&lt;h2&gt;error-handler 模块&lt;/h2&gt;" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;darkOpacity=0.05;darkOpacity2=0.1;" parent="1" vertex="1">
+                    <mxGeometry x="135" y="-165" width="270" height="130" as="geometry"/>
+                </mxCell>
+                <mxCell id="13" value="" style="edgeStyle=none;html=1;" parent="1" target="4" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="270" y="-695" as="sourcePoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="14" value="&lt;h2&gt;Antlr4 入口&lt;/h2&gt;" style="whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="210" y="-755" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="15" value="" style="edgeStyle=none;html=1;" parent="1" source="16" target="14" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="16" value="&lt;h2&gt;输入内容&lt;/h2&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+                    <mxGeometry x="220" y="-850" width="100" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="17" value="&lt;h3&gt;字符流&lt;/h3&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+                    <mxGeometry x="270" y="-680" width="70" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="18" value="&lt;h3&gt;token 流&lt;/h3&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+                    <mxGeometry x="270" y="-515" width="80" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="19" value="&lt;h3&gt;语法树&lt;/h3&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+                    <mxGeometry x="275" y="-305" width="70" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="20" value="&lt;h3&gt;初始化 error-listener，向 Lexer 和 Parser 注入 listener&lt;/h3&gt;" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="540" y="-255" width="210" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="21" value="&lt;h3&gt;对 parse tree 深度优先遍历，搜集语法错误&lt;/h3&gt;" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="540" y="-125" width="180" height="65" as="geometry"/>
+                </mxCell>
+                <mxCell id="22" value="&lt;h3&gt;过滤冗余的报错信息并上报到 store&lt;/h3&gt;" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="540" y="-5" width="180" height="75" as="geometry"/>
+                </mxCell>
+                <mxCell id="24" value="&lt;h2&gt;监听 monaco.onDidChangeModelContent&lt;/h2&gt;" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="100" y="105" width="340" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="25" value="&lt;h3&gt;store&lt;/h3&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+                    <mxGeometry x="295" y="10" width="60" height="60" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

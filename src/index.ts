@@ -1,76 +1,65 @@
-// import { CommonTokenStream, CharStreams, Parser, ANTLRErrorListener, ConsoleErrorListener, Lexer, Recognizer, RecognitionException } from "antlr4ts";
-// import { CodeCompletionCore } from "antlr4-c3/out"; // note must add the path "antlr4-c3/out"
-// import { MySQLLexer } from './grammar-output/mysql/MySQLLexer'
-// import { MultiQueryMySQLParser } from './grammar-output/mysql/MultiQueryMySQLParser';
-// import { SQLiteLexer } from './grammar-output/sqlite/SQLiteLexer'
-// import { SQLiteParser } from './grammar-output/sqlite/SQLiteParser'
-// export interface IError {
-//   startLineNumber: number;
-//   startColumn: number;
-//   endLineNumber: number;
-//   endColumn: number;
-//   message: string;
-//   code: string;
-// }
-// export class ErrorListener implements ANTLRErrorListener<any>{
-//   errors: IError[] = []
+// // import { CommonTokenStream, CharStreams, Parser, ANTLRErrorListener, ConsoleErrorListener, Lexer, Recognizer, RecognitionException, ANTLRInputStream } from "antlr4ts";
+// // import { CodeCompletionCore } from "antlr4-c3/out"; // note must add the path "antlr4-c3/out"
+// // import { MySQLLexer } from "./grammar-output/mysql/MySQLLexer";
+// // import { MultiQueryMySQLParser } from "./grammar-output/mysql/MultiQueryMySQLParser";
+// // import { SQLiteLexer } from "./grammar-output/sqlite/SQLiteLexer";
+// // import { SQLiteParser } from "./grammar-output/sqlite/SQLiteParser";
+// // import { MySQLGrammar, PLpgSQLGrammar, PlSQLGrammar, TSQLGrammar } from "./grammar-output";
 
-//   syntaxError(recognizer: Recognizer<any, any>, offendingSymbol: any, line: number, charPositionInLine: number, message: string, e: RecognitionException | undefined): void {
-//     console.log('error');
-//     console.log(recognizer);
-//     console.log(offendingSymbol);
-//     console.log(line);
-//     console.log(charPositionInLine);
-//     console.log(message);
-
-//     this.errors.push(
-//       {
-//         startLineNumber: line,
-//         endLineNumber: line,
-//         startColumn: charPositionInLine,
-//         endColumn: charPositionInLine + 1,//Let's suppose the length of the error is only 1 char for simplicity
-//         message,
-//         code: "1" // This the error code you can customize them as you want
-//       }
-//     )
-//   }
-
-//   getErrors(): IError[] {
-//     return this.errors;
-//   }
-// }
-
-// // let errorHandler = new ErrorListener()
-// // let inputStream = CharStreams.fromString("select * from 123");
+// // const ctx = "se";
+// // let inputStream = new ANTLRInputStream(ctx);
 // // let lexer = new SQLiteLexer(inputStream);
+// // let tokens = new CommonTokenStream(lexer);
 
-// // lexer.removeErrorListeners()
-// // lexer.addErrorListener(errorHandler)
-// // console.log('lexer', lexer);
+// // let parser = new SQLiteParser(tokens);
+// // let tree = parser.parse();
 
-// // let tokenStream = new CommonTokenStream(lexer);
+// // let core = new CodeCompletionCore(parser);
 
-// // let parser = new SQLiteParser(tokenStream)
+// // const preferredRules = [
+// // 	[TSQLGrammar.TSqlParser.RULE_table_name, TSQLGrammar.TSqlParser.RULE_table_name_with_hint, TSQLGrammar.TSqlParser.RULE_full_table_name, TSQLGrammar.TSqlParser.RULE_table_source],
+// // 	[TSQLGrammar.TSqlParser.RULE_column_elem, TSQLGrammar.TSqlParser.RULE_column_alias, TSQLGrammar.TSqlParser.RULE_full_column_name, TSQLGrammar.TSqlParser.RULE_output_column_name, TSQLGrammar.TSqlParser.RULE_column_declaration],
+// // ];
+// // tokens.fill();
+// // let suggestions = [];
+// // const tokenString = getTokenString(tokens, ctx);
 
-// // parser.removeErrorListeners()
-// // parser.addErrorListener(errorHandler)
+// // for (const rule of preferredRules) {
+// // 	core.preferredRules = new Set(rule);
+// // 	const candidates = core.collectCandidates(0);
+// // 	for (const candidateToken of candidates.tokens) {
+// // 		let candidateTokenValue = parser.vocabulary.getDisplayName(candidateToken[0]);
 
-// // console.log("1", errorHandler.getErrors());
+// // 		if (candidateTokenValue.startsWith("'") && candidateTokenValue.endsWith("'")) {
+// // 			candidateTokenValue = candidateTokenValue.substring(1, candidateTokenValue.length - 1);
+// // 		}
 
-// let errorHandler = new ErrorListener()
-// let inputStream = CharStreams.fromString("select * from 123");
-// let lexer = new SQLiteLexer(inputStream);
+// // 		let followOnTokens = candidateToken[1];
 
-// lexer.removeErrorListeners()
-// lexer.addErrorListener(errorHandler)
-// console.log('lexer', lexer);
+// // 		for (const followOnToken of followOnTokens) {
+// // 			let followOnTokenValue = parser.vocabulary.getDisplayName(followOnToken);
+// // 			if (followOnTokenValue.startsWith("'") && followOnTokenValue.endsWith("'")) {
+// // 				followOnTokenValue = followOnTokenValue.substring(1, followOnTokenValue.length - 1);
+// // 			}
+// // 			candidateTokenValue += followOnTokenValue;
+// // 		}
 
-// let tokenStream = new CommonTokenStream(lexer);
+// // 		if (tokenString.length === 0 || candidateTokenValue.startsWith(tokenString.toUpperCase())) {
+// // 			suggestions.push(candidateTokenValue);
+// // 		}
+// // 	}
+// // }
+// // console.log("suggestion", suggestions);
 
-// let parser = new SQLiteParser(tokenStream)
+// // function getTokenString(tokens: any, ctx: any) {
+// // 	return ctx.substring(0, ctx.length - 1);
+// // }
+// import { computeTokenPosition, getSuggestions, setTokenMatcher, filterTokens, filterTokens_fuzzySearch } from "./auto";
+// const code = `fun test() {
+// 	try {
+// 			doSomething()
+// 	} 
+// }`;
 
-// parser.removeErrorListeners()
-// parser.addErrorListener(errorHandler)
-
-// parser.parse()
-// console.log("1", errorHandler.getErrors());
+// let suggestions = getSuggestions(code, { line: 4, column: 8 }, computeTokenPosition);
+// console.log("suggestion", suggestions);
