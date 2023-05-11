@@ -10,8 +10,8 @@
     "build:prod": "webpack --mode=production --node-env=production",
     "watch": "webpack --watch",
     "dev": "webpack serve",
-    "antlr4js": "java org.antlr.v4.Tool -Xexact-output-dir -Dlanguage=TypeScript -o ./src/ANTLR1 ./SQLiteLexer.g4 ./SQLiteParser.g4",
-    "antlr4ts": "antlr4ts -Xexact-output-dir -Dlanguage=TypeScript -o ./src/ANTLR2 ./SQLiteLexer.g4 ./SQLiteParser.g4"
+    "antlr4js": "java org.antlr.v4.Tool -Xexact-output-dir -Dlanguage=TypeScript -o ./src/ANTLR1 ./grammar/SQLiteLexer.g4 ./grammar/SQLiteParser.g4",
+    "antlr4ts": "antlr4ts -Xexact-output-dir -Dlanguage=TypeScript -o ./src/ANTLR2 ./grammar/SQLiteLexer.g4 ./grammar/SQLiteParser.g4"
   },
   "keywords": ["antlr4", "Monaco editor", "auto-completion"],
   "author": "",
