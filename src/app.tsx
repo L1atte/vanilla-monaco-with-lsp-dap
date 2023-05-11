@@ -1,32 +1,29 @@
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api.js";
 import React, { createRef, useEffect, useRef } from "react";
+import { wrap, Remote } from "comlink";
 import { SQLDialect } from "./SQLCore";
 import { sqlConf, sqlDef } from "./Syntax";
 import { SQLAutocomplete } from "./AutoCompletion";
+import { CodeGenerator } from "./Worker";
 
 type EditorProps = {
 	language: string;
 };
 
-function generateSuggestion(value: string, range: monaco.Range) {
-	const sqlAutocomplete = new SQLAutocomplete(SQLDialect.MYSQL);
-	const suggestions = sqlAutocomplete.autoComplete(value);
-
-	return {
-		suggestions: [...suggestions].map(option => {
-			return {
-				label: option.value,
-				kind: option.optionType,
-				insertText: option.value,
-				range: range,
-			};
-		}),
-	};
-}
-
 export const ReactMonacoEditor: React.FC<EditorProps> = ({ language }) => {
 	const editorRef = useRef<monaco.editor.IStandaloneCodeEditor>();
 	const ref = createRef<HTMLDivElement>();
+	const workerRef = useRef<Remote<CodeGenerator> | null>(null);
+
+	useEffect(() => {
+		const worker: Worker = new Worker(new URL("./Worker/index.ts", import.meta.url), { name: "codeWorker", type: "module" });
+
+		workerRef.current = wrap<CodeGenerator>(worker);
+
+		return () => {
+			worker.terminate();
+		};
+	}, []);
 
 	useEffect(() => {
 		if (ref.current != null) {
@@ -46,14 +43,14 @@ export const ReactMonacoEditor: React.FC<EditorProps> = ({ language }) => {
 			// register auto-complete provider
 			monaco.languages.registerCompletionItemProvider(language, {
 				// @ts-ignore
-				provideCompletionItems(model, position, context, token) {
+				async provideCompletionItems(model, position, context, token) {
 					const input = model.getValue();
 					if (!input) return;
 
 					const word = model.getWordUntilPosition(position);
 					const range = new monaco.Range(position.lineNumber, word.startColumn, position.lineNumber, word.endColumn);
 
-					const { suggestions } = generateSuggestion(input, range);
+					const { suggestions } = await workerRef.current?.generateSuggestion(input, range)!;
 					return {
 						suggestions,
 					};

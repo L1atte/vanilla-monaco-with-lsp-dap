@@ -13,7 +13,11 @@
     "antlr4js": "java org.antlr.v4.Tool -Xexact-output-dir -Dlanguage=TypeScript -o ./src/ANTLR1 ./grammar/SQLiteLexer.g4 ./grammar/SQLiteParser.g4",
     "antlr4ts": "antlr4ts -Xexact-output-dir -Dlanguage=TypeScript -o ./src/ANTLR2 ./grammar/SQLiteLexer.g4 ./grammar/SQLiteParser.g4"
   },
-  "keywords": ["antlr4", "Monaco editor", "auto-completion"],
+  "keywords": [
+    "antlr4",
+    "Monaco editor",
+    "auto-completion"
+  ],
   "author": "",
   "license": "ISC",
   "devDependencies": {
@@ -36,6 +40,7 @@
     "antlr4-c3": "^2.2.2",
     "antlr4ts": "0.5.0-alpha.4",
     "assert": "^2.0.0",
+    "comlink": "^4.4.1",
     "monaco-editor": "^0.34.1",
     "monaco-editor-webpack-plugin": "^7.0.1",
     "react": "^18.2.0",
